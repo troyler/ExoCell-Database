@@ -1,5 +1,6 @@
 from asyncore import read
 from distutils.command import clean
+from re import X
 import originpro as op
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,36 +9,62 @@ import numpy as np
 import matplotlib.ticker as ticker
 from bokeh.plotting import figure, save, gridplot, output_file
 
-path = r'C:\Users\trein\Desktop\ExoCell\Data for ExoCell\MM210918'
+path = r'C:\Users\trein\Desktop\MM210504 FCD files'
 
 filenames = glob.glob(path + '/*.fcd')
+print(filenames)
 
-cleanData = []
+def plotMechs(x,y):
+        plt.scatter(x,y,marker = ".")
+        plt.show()
+        plt.yticks(np.arange(0,1.1,0.1))
+
+
+
+def fileParser(filename):
+
+    cleanData = []
+    print(filename)
+    with open(filename,"r") as file:
+        for line in file:
+            dataInfo = line.strip().split('\t')
+            if len(dataInfo) > 10:
+                cleanData.append(dataInfo)
+
+    df = pd.DataFrame(cleanData[1:], columns = cleanData[0])
+    print(df)
+
+    if "OCV" in filename:
+        x= (df['Time (Sec)'])
+        x=np.array(list(map(float,x)))
+        y= df['E_Stack (V)']
+        y=np.array(list(map(float,y)))
+        plotMechs(x,y)
+
+    elif "Cond" in filename:
+        x= (df['Time (Sec)'])
+        x=np.array(list(map(float,x)))
+        y= df['I (mA/cm²)']
+        y=np.array(list(map(float,y)))
+        plotMechs(x,y)
+
+    elif "SC" in filename:
+        x= (df['I (mA/cm²)'])
+        y= df['E_Stack (V)']
+        z = df['Power (mW/cm²)']
+        x=np.array(list(map(float,x)))
+        y=np.array(list(map(float,y)))
+        z=np.array(list(map(float,z)))
+        plotMechs(x,y)
+        plotMechs(x,z)
+
 
 for filename in filenames:
-    if "09_29_21_MM210918_OCV1_DRY H2_30 psi_serpentine-2_TFFC_1" in filename:
-        print(filename)
-        with open(filename,"r") as file:
-            for line in file:
-                dataInfo = line.strip().split('\t')
-                if len(dataInfo) > 10:
-
-                    cleanData.append(dataInfo)
+    fileParser(filename)
 
 
-df = pd.DataFrame(cleanData[1:], columns = cleanData[0])
-print(cleanData[0])
-print(df)
 
-y= df['E_Stack (V)']
-y = np.array(list(map(float, y)))
-x= np.array(df['Time (Sec)'])
-
-# corresponding y axis values
-  
-# plotting the points 
-plt.scatter(x,y,marker = ".")
-plt.xticks(np.arange(0, (len(x)+1), 8))
-plt.show()
-#
-
+#next steps
+#get all plots to show at once, not huge deal for end product
+#make figure consisting of all plots
+#get titles and axis titles displayed, use function
