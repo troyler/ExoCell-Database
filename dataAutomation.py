@@ -1,7 +1,8 @@
 from asyncore import read
 from distutils.command import clean
+from pathlib import Path
 from re import X
-import originpro as op
+import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import glob
@@ -9,19 +10,22 @@ import numpy as np
 import matplotlib.ticker as ticker
 from bokeh.plotting import figure, save, gridplot, output_file
 
-path = r'C:\Users\trein\Desktop\MM210504 FCD files'
+#path = r'/Users/tylerreinert/Desktop/MM210504 FCD files'
+path = input("Enter your folder name: ")            #prompting user for folder path
+reading = (r'{}').format(path)                      #reading files in folder to list 
 
-filenames = glob.glob(path + '/*.fcd')
-print(filenames)
 
+filenames = glob.glob(reading + "/*.fcd")
 
-def plotMechs(x, y, xtitle, ytitle):
+fileDictionary = {}
+
+def plotMechs(x, y, xtitle, ytitle, fileTitle):
      
     plt.scatter(x,y, marker=".", s=1)
 
     plt.xlabel(xtitle, fontsize=15)
     plt.ylabel(ytitle, fontsize=15)
-    plt.title( f" {xtitle}   vs   {ytitle} ", fontsize=20,pad=10)
+    plt.title(f" {fileTitle} ", fontsize=20,pad=10)
 
     plt.grid(True)
     plt.show()
@@ -29,56 +33,65 @@ def plotMechs(x, y, xtitle, ytitle):
 
 def fileParser(filename):
     cleanData = []
-    zeroRow = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    print(filename)
-    with open(filename, "r") as file:
+    fileTitle = filename[filename.rindex('/')+1:]
+    with open(filename, "r", encoding='latin_1') as file:
         for line in file:
             dataInfo = line.strip().split('\t')
             if len(dataInfo) > 10:
                     cleanData.append(dataInfo)
     if cleanData[0][0] == "Time (Sec)" :  #mainly for QA 
-        df = pd.DataFrame(cleanData[1:], columns=cleanData[0])
-        df.loc[len(df)] = zeroRow
-        print(df)
+        fileDictionary[fileTitle] = pd.DataFrame(cleanData[1:], columns=cleanData[0])
+        occurence = fileDictionary[fileTitle]
 
 
-    
-        timeTitle = df.columns[0]
-        voltageTitle = df.columns[5]
-        currentDensityTitle = df.columns[2]
-        powerDensityTitle = df.columns[4]
+        fileTitle = filename[filename.rindex('/')+1:]
+        timeTitle = occurence.columns[0]
+        voltageTitle = occurence.columns[5]
+        currentDensityTitle = occurence.columns[2]
+        powerDensityTitle = occurence.columns[4]
+
         
         
 
         if "OCV" in filename:
-            x = df['Time (Sec)']
+            x = occurence['Time (Sec)']
             x = np.array(list(map(float, x)))
-            y = df['E_Stack (V)']
+            y = occurence['E_Stack (V)']
             y = np.array(list(map(float, y)))
-            plotMechs(x, y,timeTitle, voltageTitle)
+            plotMechs(x, y,timeTitle, voltageTitle, fileTitle)
 
         elif "Cond" in filename:
-            x = (df['Time (Sec)'])
+            x = (occurence['Time (Sec)'])
             x = np.array(list(map(float, x)))
-            y = df['I (mA/cm²)']
+            y = occurence['I (mA/cm²)']
             y = np.array(list(map(float, y)))
-            plotMechs(x, y,timeTitle,currentDensityTitle)
+            plotMechs(x, y,timeTitle,currentDensityTitle, fileTitle)
 
         elif "SC" in filename:
-            x = (df['I (mA/cm²)'])
-            y = df['E_Stack (V)']
-            z = df['Power (mW/cm²)']
+            x = (occurence['I (mA/cm²)'])
+            y = occurence['E_Stack (V)']
+            z = occurence['Power (mW/cm²)']
             x = np.array(list(map(float, x)))
             y = np.array(list(map(float, y)))
             z = np.array(list(map(float, z)))
             plt.yticks(np.arange(0, 1.1, 0.1))
-            plotMechs(x, y, currentDensityTitle,voltageTitle)
-            plotMechs(x, z, currentDensityTitle, powerDensityTitle)
+            plotMechs(x, y, currentDensityTitle,voltageTitle, fileTitle)
+            plotMechs(x, z, currentDensityTitle, powerDensityTitle, fileTitle)
 
 
 
 for filename in filenames:
     fileParser(filename)
+
+#print(fileDictionary)
+
+
+
+for testRun in fileDictionary:
+    writer = pd.ExcelWriter(f"{testRun}")
+    fileDictionary[testRun].to_excel(writer, sheet_name=testRun)
+
+
 # next steps
 # get all plots to show at once, not huge deal for end product
 # make figure consisting of all plots
