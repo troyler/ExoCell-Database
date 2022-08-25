@@ -43,6 +43,8 @@ def fileParser(filename):
         fileDictionary[fileTitle] = pd.DataFrame(cleanData[1:], columns=cleanData[0])
         occurence = fileDictionary[fileTitle]
 
+        print(occurence)
+
 
         fileTitle = filename[filename.rindex('/')+1:]
         timeTitle = occurence.columns[0]
