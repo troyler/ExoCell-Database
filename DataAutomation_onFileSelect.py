@@ -10,6 +10,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
 
         self.fileDictionary= {}
+        self.setWindowTitle("TFFC Data Automation")
     
 
         central_widget = QtWidgets.QWidget()
@@ -22,26 +23,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
         lay = QtWidgets.QGridLayout(central_widget)
 
-        for w, (r, c) in zip(
-            (self.m_w11, self.m_w12, self.m_w21, self.m_w22),
-            ((0, 0), (0, 1), (1, 0), (1, 1)),
-        ):
-            lay.addWidget(w, r, c)
-        for c in range(2):
-            lay.setColumnStretch(c, 1)
-        for r in range(2):
-            lay.setRowStretch(r, 1)
+      
+        lay.addWidget(self.m_w11, 1,2 )
+        lay.addWidget(self.m_w22, 1 , 1)
+
 
         lay = QtWidgets.QVBoxLayout(self.m_w11)
         self.fileHolder = QtWidgets.QListWidget()
         lay.addWidget(self.fileHolder)
-
-        lay = QtWidgets.QVBoxLayout(self.m_w12)
-        self.graphShower = QtWidgets.QTableView()
-        lay.addWidget(self.graphShower)
-
-        lay = QtWidgets.QVBoxLayout(self.m_w21)
-        lay.addWidget(QtWidgets.QLineEdit())
 
         lay = QtWidgets.QVBoxLayout(self.m_w22)
         self.button = QtWidgets.QPushButton("Press to open files")
