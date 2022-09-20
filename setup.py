@@ -73,13 +73,14 @@ class MainWindow(QMainWindow):
     def filenameBreakdown(self):
         for path in currentDirectoryList:
             pathFile = path[path.rindex('/')+1:-4]
-            print(pathFile.split('_'))
-            #cell = pathDeatiledList[3]
-           # testVersion = pathDeatiledList[4]
+            pathDeatiledList = pathFile.split('_')
+            print(pathDeatiledList[3])
+    
+            testVersion = pathDeatiledList[4]
 
             pathFileDate = pathFile[0:8]
             
-           # namingBreakdown[testVersion] = {"Full Path": path, "File Name" : pathFile, "Test Date" : pathFileDate} #"Cell" : cell, "Test" : testVersion}
+           # namingBreakdown[testVersion] = {"Full Path": path, "File Name" : pathFile, "Test Date" : pathFileDate, "Cell" : cell, "Test" : testVersion}
 
 
     
