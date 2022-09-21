@@ -48,7 +48,7 @@ class MainWindow(QMainWindow):
         self.fileListWidget = QtWidgets.QListWidget()
         self.fileListWidget.setAlternatingRowColors(True)
         self.namingLabel = QtWidgets.QLabel("File Breakdown")
-        self.analysisButton = QtWidgets.QPushButton("Analyze files")     
+        self.analysisButton = QtWidgets.QPushButton("Create Excel Files")     
         self.analysisButton.clicked.connect(lambda: self.fileRunner(namingConv))  
         self.fileTableBreak= QtWidgets.QTableWidget(6,6)
 
@@ -118,7 +118,7 @@ class MainWindow(QMainWindow):
                             self.fileViewerFunc()
 
                         else:
-                            self.msg.setText(f"{self.fileTitle} had was not an OCV, SC, or Cond file")
+                            self.msg.setText(f"{self.fileTitle} was not an OCV, SC, or Cond file")
                             self.msg.exec_()  
                     else:
                         self.msg.setText(f"{self.fileTitle} had improper naming convention and was removed")
@@ -169,9 +169,12 @@ class MainWindow(QMainWindow):
             cleanData = []  #opening and reading the incoming file as workingFile
             for line in workingFile:              #for each line in this file 
                 dataInfo = line.strip().split('\t')     #strip this line of unneeded info and split it by tab. Returns a list of each item split
-                if len(dataInfo) > 10:  #if the len of the list is greather than ten
+                if len(dataInfo) > 10 and dataInfo[0]=="Time (Sec)":  #if the len of the list is greather than ten
                     cleanData.append(dataInfo)
-            if cleanData[0][0] == "Time (Sec)" :  
+                elif len(dataInfo) > 10:
+                    dataInfo = list(map(float,dataInfo))
+                    cleanData.append(dataInfo) 
+            if cleanData[0][0] == "Time (Sec)" : 
                     fileDictionary[name] = pd.DataFrame(cleanData[1:], columns=cleanData[0])
                     self.occurence = fileDictionary[name]
                     #print(fileDictionary[name])
@@ -194,7 +197,7 @@ class MainWindow(QMainWindow):
             currentFileName = namingConv[self.keys[x]]["File Title"]
             with pd.ExcelWriter(f"{self.locationPath}/{currentFileName}.xlsx") as writer:
                 writer.if_sheet_exists = 'replace'
-                fileDictionary[currentFileName].to_excel(writer, sheet_name = "Summary Files", engine="xlsxwriter")
+                fileDictionary[currentFileName].to_excel(writer, sheet_name = f"{currentFileName[0:25]}", engine="xlsxwriter", index = False)
                 self.saveLocationStamp.setText(f"Saving {currentFileName} to")
                 writer.save()
                 print("saving")
@@ -207,9 +210,6 @@ class MainWindow(QMainWindow):
                 condPlots.to_excel(writer, sheet_name = "Conditioning Plots", engine="xlsxwriter")
                 x +=1
         self.saveLocationStamp.setText("Saving Complete")
-
-
-
 
 
 window = MainWindow()
