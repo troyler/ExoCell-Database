@@ -1,4 +1,5 @@
 from ctypes import alignment
+from distutils.filelist import FileList
 from operator import itemgetter
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableWidgetItem
 from PyQt5 import QtWidgets
@@ -14,6 +15,7 @@ import xlsxwriter
 
 fileDictionary = {}
 currentDirectoryList =[]
+fileList = []
 namingConv = {}
 ocvPlots = pd.DataFrame()
 scPlots = pd.DataFrame()
@@ -31,10 +33,14 @@ class MainWindow(QMainWindow):
         
         self.namingBreakdown = {}
 
+        self.msg = QtWidgets.QMessageBox()
+
         self.chooseSaveLocationButton = QtWidgets.QPushButton("Press to choose save location")
         self.chooseSaveLocationButton.clicked.connect(lambda: self.saveLocation())
         self.saveLocationStamp = QtWidgets.QLabel("Save Location")
         self.saveLocationLabel = QtWidgets.QLabel("-------------")
+        self.saveLocationLabel.setWordWrap(True)
+        self.saveLocationLabel.setMaximumWidth(150)
 
         self.setWindowTitle("TFFC Data Automation")
         self.openFileButton = QtWidgets.QPushButton("Press to open files")
@@ -78,37 +84,56 @@ class MainWindow(QMainWindow):
 #function to bring in file paths as strings in a list
     def fileChooser(self):   
         fname = QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "FCD Files (*.fcd)") #tuple ([list of strings], string)
-        for file in fname[0]:   #for each file in self.fname[0], where the list of file paths is held
-            if file not in currentDirectoryList:   #checking to make sure current file path is not in list to hold filepaths
-                number = file[-5]
-                self.fileTitle = file[file.rindex('/')+1:-4]#removing the path to obtain just the filename
-                fileDate = self.fileTitle[0:8].split("_")  
-                self.testDate = "/".join(fileDate)
-                currentDirectoryList.append((file, number, self.fileTitle))
-                 #adding the file to the list holding the file paths outside of self.fname
-                fileSplit = file.split("_")
-                if len(fileSplit[3]) == 8:
-                    cellName = fileSplit[3]
-                    testTypeCount = fileSplit[4].replace(" ", "")
-                    if "SC" or "Cond" or "OCV" in testTypeCount and len(testTypeCount) <=6:
-                        cellTestNumber = str(fileSplit[-1][0])
-                        otherInfo = " ".join(fileSplit[4:-1])
-                        namingConv[self.fileTitle] = {"Cell ID" : cellName,
-                                                        "Test Iteration" : testTypeCount,
-                                                        "Other Info" : otherInfo,
-                                                        "File Location" : file,
-                                                        "File Title": self.fileTitle,
-                                                        "Cell Test Number" : cellTestNumber,
-                                                        "Test Date" : self.testDate}
-                        print(cellName, testTypeCount, cellTestNumber, otherInfo)
-                self.fileListWidget.addItem(self.fileTitle)
+        for file in fname[0]:
+            self.fileTitle = file[file.rindex('/')+1:-4]   #for each file in self.fname[0], where the list of file paths is held
+            if file not in fileList:   #checking to make sure current file path is not in list to hold filepaths
+                try: 
+                    number = file[-5]
+                    self.fileTitle = file[file.rindex('/')+1:-4]#removing the path to obtain just the filename
+                    fileDate = self.fileTitle[0:8].split("_")  
+                    self.testDate = "/".join(fileDate)
+                    #adding the file to the list holding the file paths outside of self.fname
+                    fileSplit = file.split("_")
+                    print(fileSplit)   
+                    if len(fileSplit[3]) == 8:
+                        fileList.append(file)
+                        currentDirectoryList.append((file, number, self.fileTitle))
+                        cellName = fileSplit[3]
+                        testTypeCount = fileSplit[4].replace(" ", "")
+                        if "SC" or "Cond" or "OCV" in testTypeCount and len(testTypeCount) <=6:
+                            cellTestNumber = str(fileSplit[-1][0])
+                            otherInfo = " ".join(fileSplit[4:-1])
+                            namingConv[self.fileTitle] = {"Cell ID" : cellName,
+                                                            "Test Iteration" : testTypeCount,
+                                                            "Other Info" : otherInfo,
+                                                            "File Location" : file,
+                                                            "File Title": self.fileTitle,
+                                                            "Cell Test Number" : cellTestNumber,
+                                                            "Test Date" : self.testDate}
+                            print(cellName, testTypeCount, cellTestNumber, otherInfo)
+                            self.fileListWidget.addItem(self.fileTitle)
+                            print(namingConv)
+                            currentDirectoryList.sort(key=itemgetter(1))
+                            print(currentDirectoryList)
+                            self.fileViewerFunc()
+
+                        else:
+                            self.msg.setText(f"{self.fileTitle} had was not an OCV, SC, or Cond file")
+                            self.msg.exec_()  
+                    else:
+                        self.msg.setText(f"{self.fileTitle} had improper naming convention and was removed")
+                        self.msg.exec_() 
+                        
+                except IndexError:     
+                    self.msg.setText(f"{self.fileTitle} had improper naming convention and was removed")
+                    self.msg.exec_() 
+                    continue
             else: 
-                return
-        print(namingConv)
-        currentDirectoryList.sort()  
-        currentDirectoryList.sort(key=itemgetter(1))
-        self.fileViewerFunc()
-        print(currentDirectoryList)
+               self.msg.setText(f"{self.fileTitle} already selected")
+               self.msg.exec_()
+               continue 
+               # return
+
 
 
     def fileViewerFunc(self):
@@ -116,7 +141,7 @@ class MainWindow(QMainWindow):
         y= 0
         self.keys = sorted((namingConv.keys()))
 
-        self.horizontalHeaders = ["Test Number" , "Test Type/Iteration", "Cell ID", "File Title", "Other Info"]
+        self.horizontalHeaders = ["Test Number" , "Test Type/Iteration", "Cell ID", "Test Date", "File Title", "Other Info"]
         self.fileTableBreak.setColumnCount(len(self.horizontalHeaders))
         self.fileTableBreak.setRowCount(len(currentDirectoryList))
         while x < len(currentDirectoryList):
@@ -125,9 +150,9 @@ class MainWindow(QMainWindow):
             self.fileTableBreak.setItem(x,0,QTableWidgetItem(namingConv[fileKey]["Cell Test Number"]))
             self.fileTableBreak.setItem(x,1,QTableWidgetItem(namingConv[fileKey]["Test Iteration"]))
             self.fileTableBreak.setItem(x,2,QTableWidgetItem(namingConv[fileKey]["Cell ID"]))
-            self.fileTableBreak.setItem(x,3,QTableWidgetItem(namingConv[fileKey]["File Title"]))
-            self.fileTableBreak.setItem(x,4,QTableWidgetItem(namingConv[fileKey]["Other Info"]))
-            self.fileTableBreak.setItem(x,5,QTableWidgetItem(namingConv[fileKey]["Test Date"]))
+            self.fileTableBreak.setItem(x,3,QTableWidgetItem(namingConv[fileKey]["Test Date"]))
+            self.fileTableBreak.setItem(x,4,QTableWidgetItem(namingConv[fileKey]["File Title"]))
+            self.fileTableBreak.setItem(x,5,QTableWidgetItem(namingConv[fileKey]["Other Info"]))
             x+=1
             y+=1
             
@@ -167,10 +192,10 @@ class MainWindow(QMainWindow):
         x= 0
         while x < len(currentDirectoryList):
             currentFileName = namingConv[self.keys[x]]["File Title"]
-            self.saveLocationStamp.setText(f"Saving {currentFileName} to")
             with pd.ExcelWriter(f"{self.locationPath}/{currentFileName}.xlsx") as writer:
                 writer.if_sheet_exists = 'replace'
                 fileDictionary[currentFileName].to_excel(writer, sheet_name = "Summary Files", engine="xlsxwriter")
+                self.saveLocationStamp.setText(f"Saving {currentFileName} to")
                 writer.save()
                 print("saving")
                 x+=1
@@ -182,6 +207,8 @@ class MainWindow(QMainWindow):
                 condPlots.to_excel(writer, sheet_name = "Conditioning Plots", engine="xlsxwriter")
                 x +=1
         self.saveLocationStamp.setText("Saving Complete")
+
+
 
 
 
