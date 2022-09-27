@@ -178,18 +178,19 @@ class MainWindow(QMainWindow):
                         
 
                     else:
-                        #print(self.fileTitle)
-                        number = file[-5]
+                        print(self.fileTitle)
+                        number = self.fileTitle[-1]
                         print(number)
-                        fileDate = self.fileTitle[0:8].split("_")  
-                        self.testDate = "/".join(fileDate) #adding the file to the list holding the file paths outside of self.fname
-                        fileSplit = file.split("_")
-                        #print(fileSplit)   
-                        if len(fileSplit[3]) == 8:
+                        fileSplit = self.fileTitle.split("_")
+                        self.dateData = fileSplit[0:3]
+                        self.testDate = "/".join(self.dateData)
+                        print(fileSplit)   
+                        if len(fileSplit[3]) >= 6 and len(fileSplit[3]) <= 10:
                             fileList.append(file)
                             currentDirectoryList.append((file, number, self.fileTitle))
                             cellName = fileSplit[3]
                             testTypeCount = fileSplit[4].replace(" ", "")
+                            print(testTypeCount)
                             if "SC" or "Cond" or "OCV" in testTypeCount and len(testTypeCount) <=6:
                                 cellTestNumber = str(fileSplit[-1][0])
                                 otherInfo = " ".join(fileSplit[4:-1])
