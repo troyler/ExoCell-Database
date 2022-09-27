@@ -177,6 +177,28 @@ class MainWindow(QMainWindow):
         print(fileDictionary)
     
 
+           
+       #         summaryFiles.to_excel(writer, sheet_name = "Summary Files", engine="xlsxwriter")
+       #         scPlots.to_excel(writer, sheet_name = "Scan Current Plots", engine="xlsxwriter")
+       #         condPlots.to_excel(writer, sheet_name = "Conditioning Plots", engine="xlsxwriter")
+       #         workbook = writer.book
+       #         if "Cond" in currentFileName:
+       #             data = fileDictionary[currentFileName]
+       #             sheetName = "Conditioning Plots"
+       #             worksheet = writer.sheets[sheetName]
+       #             chart=workbook.add_chart({'type':'scatter'})
+       #             x = data['Time (Sec)']
+       #             y = data['I (mA/cm²)']
+       #             print(y)
+       #             max_row = len(x)
+       #             chart.add_series({
+       #             'name':       "Sample Plot",
+       #             'categories': [sheetName, 1, x, x],
+       #             'values':     [sheetName, y, y],
+       #             'marker':     {'type': 'circle', 'size': 4}})
+       #             worksheet.insert_chart("D2", chart)
+       #         print("saving")
+       #         x+=1
 
 
     
