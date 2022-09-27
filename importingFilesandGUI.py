@@ -38,22 +38,28 @@ class AnotherWindow(QWidget):
         layout = QVBoxLayout()
         self.xlsxListWidget = QtWidgets.QListWidget()
         self.xlsxListWidget.setAlternatingRowColors(True)
-        self.finalButton = QtWidgets.QPushButton("Push to Show files")
-        self.finalButton.clicked.connect(lambda: self.getXLSXinTable(self.locationPath))
+        self.finalButton = QtWidgets.QPushButton("Select Save Location")
+        self.finalButton.clicked.connect(lambda :print("Working up to here"))
+        self.xlsxButton = QtWidgets.QPushButton("Push to Select Files")
+        self.xlsxButton.clicked.connect(lambda: self.getXLSXinTable())
         self.setLayout(layout)
         layout.addWidget(self.xlsxListWidget)
+        layout.addWidget(self.xlsxButton)
         layout.addWidget(self.finalButton)
     
-    def getXLSXinTable (self, locationPath):
+    def getXLSXinTable (self):
         x= 0
-        saveLocation = os.listdir(f"{locationPath}")
-        for each in saveLocation:
+        saveLocation =  QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "Excel Files (*.xlsx)") #tuple ([list of strings], string)
+        for each in saveLocation[0]:
             if ".DS_Store" in each:
                 saveLocation.remove(".DS_Store")
-        while x < len(saveLocation):
-            xlsxFile = saveLocation[x]
+        while x < len(saveLocation[0]):
+            xlsxFile = saveLocation[0][x]
             self.xlsxListWidget.addItem(xlsxFile)
             x+=1
+
+    def extractingGraphs(self):
+        pass
 
 class MainWindow(QMainWindow):
     
@@ -300,13 +306,8 @@ class MainWindow(QMainWindow):
         self.saveLocationStamp.setText("Saving Complete")
 
 
-
     
-
-
-
-
-if __name__ == "__main__":
+if  __name__ == "__main__":
    
     app = QApplication(sys.argv)  
     window = MainWindow()
