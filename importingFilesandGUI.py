@@ -140,7 +140,7 @@ class MainWindow(QMainWindow):
             if file not in fileList:   #checking to make sure current file path is not in list to hold filepaths
                 try:
                     self.fileType = self.fileTitle.split("_")
-                    if self.fileType[0].isdigit() and len(self.fileType[0]) == 1:
+                    if self.fileType[0].isdigit() and len(self.fileType[0]) <= 2 and self.fileType[2].isdigit() == False:
                         self.fileData = self.fileType
                         print(self.fileData)
                         print(self.fileType)
@@ -179,9 +179,9 @@ class MainWindow(QMainWindow):
 
                     else:
                         print(self.fileTitle)
-                        number = self.fileTitle[-1]
-                        print(number)
                         fileSplit = self.fileTitle.split("_")
+                        number = fileSplit[-1]
+                        print(number)
                         self.dateData = fileSplit[0:3]
                         self.testDate = "/".join(self.dateData)
                         print(fileSplit)   
@@ -192,7 +192,7 @@ class MainWindow(QMainWindow):
                             testTypeCount = fileSplit[4].replace(" ", "")
                             print(testTypeCount)
                             if "SC" or "Cond" or "OCV" in testTypeCount and len(testTypeCount) <=6:
-                                cellTestNumber = str(fileSplit[-1][0])
+                                cellTestNumber = fileSplit[-1]
                                 otherInfo = " ".join(fileSplit[4:-1])
                                 namingConv[self.fileTitle] = {"Cell ID" : cellName,
                                                                 "Test Iteration" : testTypeCount,
@@ -236,6 +236,7 @@ class MainWindow(QMainWindow):
         self.fileTableBreak.setColumnCount(len(self.horizontalHeaders))
         self.fileTableBreak.setRowCount(len(currentDirectoryList))
         while x < len(currentDirectoryList):
+            try1 = currentDirectoryList.sort(key = itemgetter(1))
             fileKey = currentDirectoryList[x][2]
             self.fileTableBreak.setHorizontalHeaderLabels(self.horizontalHeaders)
             self.fileTableBreak.setItem(x,0,QTableWidgetItem(namingConv[fileKey]["Cell Test Number"]))
