@@ -33,7 +33,7 @@ class AnotherWindow(QWidget):
     """
     def __init__(self, locationPath):
         super().__init__()
-        self.setGeometry(0,0,700,400)
+        self.setGeometry(800,0,700,400)
         self.locationPath = locationPath
         layout = QVBoxLayout()
         self.xlsxListWidget = QtWidgets.QListWidget()
@@ -66,11 +66,11 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.setGeometry(0,0,700,400)
+        self.setGeometry(0,300,1000,700)
 
         self.w = None  # No external window yet.
         self.button = QtWidgets.QPushButton("Push for Window")
-        self.button.clicked.connect(self.show_new_window)
+        self.button.clicked.connect(lambda: self.show_new_window(self.saveLocation))
 
         self.msg = QtWidgets.QMessageBox()
 
@@ -102,7 +102,7 @@ class MainWindow(QMainWindow):
         self.fileViewerLayout.addWidget(self.namingLabel)
         self.fileViewerLayout.addWidget(self.fileTableBreak)
         self.fileViewerLayout.addWidget(self.analysisButton)
-        
+        self.fileViewerLayout.addWidget(self.button)
 
         self.fileSaveLayout = QVBoxLayout()
         self.fileSaveLayout.addWidget(self.saveLocationStamp)
