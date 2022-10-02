@@ -40,11 +40,13 @@ class AnotherWindow(QWidget):
         self.condLetterCount = 2
         self.scCount = 6
         self.scLetterCount = 2
+        self.selectMsg = QtWidgets.QMessageBox()
 
 
 
 
-        self.setGeometry(800,0,700,400)
+
+        self.setGeometry(800,200,700,400)
         self.locationPath = locationPath
         layout = QVBoxLayout()
         self.xlsxListWidget = QtWidgets.QListWidget()
@@ -61,12 +63,17 @@ class AnotherWindow(QWidget):
     
     def getXLSXinTable (self):
         x= 0
-        saveLocation =  QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "Excel Files (*.xlsx)") #tuple ([list of strings], string)
-        self.longPath = saveLocation[0][0][:saveLocation[0][0].rindex("/")+1]
-        self.pathStep = self.longPath.split("/")
-        self.relativePath = saveLocation[0][0][saveLocation[0][0].rindex("/")+1:]
+        try:
+            saveLocation =  QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "Excel Files (*.xlsx)") #tuple ([list of strings], string)
+            self.longPath = saveLocation[0][0][:saveLocation[0][0].rindex("/")+1]
+            self.pathStep = self.longPath.split("/")
+            self.relativePath = saveLocation[0][0][saveLocation[0][0].rindex("/")+1:]
+        except IndexError:     
+            self.selectMsg.setText("Error, must choose files")
+            self.selectMsg.exec_()
+            return
+             
 
-        print(self.relativePath)
         for each in saveLocation[0]:
             if ".DS_Store" in each:
                 saveLocation.remove(".DS_Store")
@@ -78,6 +85,10 @@ class AnotherWindow(QWidget):
                     summaryList.append(shortName)
                     self.xlsxListWidget.addItem(shortName)
                     x+=1
+                
+       
+               
+
 
     def gettingSummaryName(self):
         text, ok = QtWidgets.QInputDialog.getText(self, 'input dialog', 'Enter Name for Summary File')
@@ -86,7 +97,7 @@ class AnotherWindow(QWidget):
             print(text)
     
     def extractingGraphs(self):
-        workbook = xlsxwriter.Workbook('{}{}Summary_File.xlsx'.format(self.longPath,self.sumName))
+        workbook = xlsxwriter.Workbook('{}{}_Summary_File.xlsx'.format(self.longPath,self.sumName))
         workbook.add_worksheet("File Breakdown")
         workbook.add_worksheet("Conditioning Plots")
         workbook.add_worksheet("Scan Current Plots")
@@ -114,6 +125,7 @@ class AnotherWindow(QWidget):
                     'name':       [f"{seriesRef}", 0, 2],
                     'categories': [f"{seriesRef}", 1, 0, dataSet.max_row, 0],
                     'values':     [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
+                    'marker':     {'type': 'circle', 'size': 1},
                 }) 
                 chart1.set_title ({'name': '{}'.format(relativePath), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
                 chart1.set_legend({'position': 'none'})
@@ -128,27 +140,51 @@ class AnotherWindow(QWidget):
 
                 openFile.close()
 
-                if "SC" in file:
-                    chart1 = workbook.add_chart({'type': 'scatter'})
-                    print(seriesRef)
-                
-                    chart1.add_series({
-                        'name':       [f"{seriesRef}", 0, 2],
-                        'categories': [f"{seriesRef}", 1, 0, dataSet.max_row, 0],
-                        'values':     [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
-                    }) 
-                    chart1.set_title ({'name': '{}'.format(relativePath), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
-                    chart1.set_legend({'position': 'none'})
-                    chart1.set_x_axis({'name': 'Time (Sec)', 'major_gridlines': {'visible': True}})
-                    chart1.set_y_axis({'name': 'I (mA/cm²)'})
-                    scPlots.insert_chart('{}{}'.format(columnList[self.scLetterCount%2],self.scCount), chart1)
-                    if self.scLetterCount%2 == 0 :
-                        self.scLetterCount += 1
-                    else:
-                        self.scCount += 17
-                        self.scLetterCount += 1
+            elif "SC" in file:
+                chart1 = workbook.add_chart({'type': 'scatter'})
+                print(seriesRef)
+            
+                chart1.add_series({
+                    'name':       [f"{seriesRef}", 0, 2],
+                    'categories': [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
+                    'values':     [f"{seriesRef}", 1, 5, dataSet.max_row, 5],
+                    'marker':     {'type': 'circle', 'size': 1},
+                }) 
+                chart1.set_title ({'name': '{}'.format(relativePath), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
+                chart1.set_legend({'position': 'none'})
+                chart1.set_x_axis({'name': 'I (mA/cm²)', 'major_gridlines': {'visible': True}})
+                chart1.set_y_axis({'name': 'E_Stack (V)'})
+                scPlots.insert_chart('{}{}'.format(columnList[self.scLetterCount%2],self.scCount), chart1)
+                if self.scLetterCount%2 == 0 :
+                    self.scLetterCount += 1
+                else:
+                    self.scCount += 17
+                    self.scLetterCount += 1
 
-                    openFile.close()
+                chart2 = workbook.add_chart({'type': 'scatter'})
+                print(seriesRef)
+            
+                chart2.add_series({
+                    'name':       [f"{seriesRef}", 0, 2],
+                    'categories': [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
+                    'values':     [f"{seriesRef}", 1, 4, dataSet.max_row, 4],
+                    'marker':     {'type': 'circle', 'size': 1},
+                }) 
+                chart2.set_title ({'name': '{}'.format(relativePath), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
+                chart2.set_legend({'position': 'none'})
+                chart2.set_x_axis({'name': 'I (mA/cm²)', 'major_gridlines': {'visible': True}})
+                chart2.set_y_axis({'name': 'Power (mW/cmÂ²)'})
+                scPlots.insert_chart('{}{}'.format(columnList[self.scLetterCount%2],self.scCount), chart2)
+
+                if self.scLetterCount%2 == 0 :
+                    self.scLetterCount += 1
+                else:
+                    self.scCount += 17
+                    self.scLetterCount += 1
+
+                
+
+                openFile.close()
         workbook.close()
 
 class MainWindow(QMainWindow):
