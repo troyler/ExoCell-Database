@@ -31,7 +31,7 @@ class AnotherWindow(QWidget):
     def __init__(self, locationPath):
         super().__init__()
 
-        self.btn = QtWidgets.QPushButton('Show Dialog', self)
+        self.btn = QtWidgets.QPushButton('Click to enter cell name', self)
         self.btn.move(20, 20)
         self.btn.clicked.connect(self.gettingSummaryName)
         self.le = QtWidgets.QLineEdit(self)
@@ -41,6 +41,7 @@ class AnotherWindow(QWidget):
         self.scCount = 6
         self.scLetterCount = 2
         self.selectMsg = QtWidgets.QMessageBox()
+        self.setWindowTitle("Graphing XLSX Files")
 
 
 
@@ -48,19 +49,18 @@ class AnotherWindow(QWidget):
 
         self.setGeometry(800,200,700,400)
         self.locationPath = locationPath
-        layout = QVBoxLayout()
+        self.layout = QVBoxLayout()
         self.xlsxListWidget = QtWidgets.QListWidget()
         self.xlsxListWidget.setAlternatingRowColors(True)
         self.finalButton = QtWidgets.QPushButton("Create Summary File")
         self.finalButton.clicked.connect(lambda: self.extractingGraphs())
         self.xlsxButton = QtWidgets.QPushButton("Push to Select Files")
         self.xlsxButton.clicked.connect(lambda: self.getXLSXinTable())
-        self.setLayout(layout)
-        layout.addWidget(self.xlsxListWidget)
-        layout.addWidget(self.xlsxButton)
-        layout.addWidget(self.finalButton)
-        layout.addWidget(self.btn)
-    
+        self.setLayout(self.layout)
+        self.layout.addWidget(self.xlsxListWidget)
+        self.layout.addWidget(self.xlsxButton)
+        self.layout.addWidget(self.btn)
+
     def getXLSXinTable (self):
         x= 0
         try:
@@ -85,9 +85,6 @@ class AnotherWindow(QWidget):
                     summaryList.append(shortName)
                     self.xlsxListWidget.addItem(shortName)
                     x+=1
-                
-       
-               
 
 
     def gettingSummaryName(self):
@@ -95,6 +92,7 @@ class AnotherWindow(QWidget):
         if ok:
             self.sumName = text
             print(text)
+            self.layout.addWidget(self.finalButton)
     
     def extractingGraphs(self):
         workbook = xlsxwriter.Workbook('{}{}_Summary_File.xlsx'.format(self.longPath,self.sumName))
@@ -117,7 +115,7 @@ class AnotherWindow(QWidget):
 
             fileBreakdown.write_column('A1', summaryList)
 
-            if "Cond" in file:
+            if "Cond" in file and "SC" not in file:
                 chart1 = workbook.add_chart({'type': 'scatter'})
                 print(seriesRef)
             
@@ -125,9 +123,9 @@ class AnotherWindow(QWidget):
                     'name':       [f"{seriesRef}", 0, 2],
                     'categories': [f"{seriesRef}", 1, 0, dataSet.max_row, 0],
                     'values':     [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
-                    'marker':     {'type': 'circle', 'size': 1},
+                    'marker':     {'type': 'diamond', 'size': 4},
                 }) 
-                chart1.set_title ({'name': '{}'.format(relativePath), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
+                chart1.set_title ({'name': '{}'.format(relativePath[0:-5]), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
                 chart1.set_legend({'position': 'none'})
                 chart1.set_x_axis({'name': 'Time (Sec)', 'major_gridlines': {'visible': True}})
                 chart1.set_y_axis({'name': 'I (mA/cm²)'})
@@ -148,9 +146,9 @@ class AnotherWindow(QWidget):
                     'name':       [f"{seriesRef}", 0, 2],
                     'categories': [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
                     'values':     [f"{seriesRef}", 1, 5, dataSet.max_row, 5],
-                    'marker':     {'type': 'circle', 'size': 1},
+                    'marker':     {'type': 'diamond', 'size': 4},
                 }) 
-                chart1.set_title ({'name': '{}'.format(relativePath), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
+                chart1.set_title ({'name': '{}'.format(relativePath[0:-5]), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
                 chart1.set_legend({'position': 'none'})
                 chart1.set_x_axis({'name': 'I (mA/cm²)', 'major_gridlines': {'visible': True}})
                 chart1.set_y_axis({'name': 'E_Stack (V)'})
@@ -168,9 +166,9 @@ class AnotherWindow(QWidget):
                     'name':       [f"{seriesRef}", 0, 2],
                     'categories': [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
                     'values':     [f"{seriesRef}", 1, 4, dataSet.max_row, 4],
-                    'marker':     {'type': 'circle', 'size': 1},
+                    'marker':     {'type': 'diamond', 'size': 4},
                 }) 
-                chart2.set_title ({'name': '{}'.format(relativePath), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
+                chart2.set_title ({'name': '{}'.format(relativePath[0:-5]), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
                 chart2.set_legend({'position': 'none'})
                 chart2.set_x_axis({'name': 'I (mA/cm²)', 'major_gridlines': {'visible': True}})
                 chart2.set_y_axis({'name': 'Power (mW/cmÂ²)'})
