@@ -20,6 +20,7 @@ fileDictionary = {}
 currentDirectoryList =[]
 fileList = []
 namingConv = {}
+summaryList = ["Files graphed in this sheet", "    "]
 
 
 class AnotherWindow(QWidget):
@@ -35,6 +36,10 @@ class AnotherWindow(QWidget):
         self.btn.clicked.connect(self.gettingSummaryName)
         self.le = QtWidgets.QLineEdit(self)
         self.le.move(130, 22)
+        self.condCount = 6
+        self.condLetterCount = 2
+        self.scCount = 6
+        self.scLetterCount = 2
 
 
 
@@ -70,6 +75,7 @@ class AnotherWindow(QWidget):
                     xlsxFile = saveLocation[0][x]
                     xlsxFiles.append(xlsxFile)
                     shortName = xlsxFile[xlsxFile.rindex("/")+1:]
+                    summaryList.append(shortName)
                     self.xlsxListWidget.addItem(shortName)
                     x+=1
 
@@ -88,40 +94,61 @@ class AnotherWindow(QWidget):
         condPlots = workbook.get_worksheet_by_name("Conditioning Plots")
         scPlots = workbook.get_worksheet_by_name("Scan Current Plots")
 
+
         for file in xlsxFiles:
             openFile = openpyxl.load_workbook(file, read_only=True)
             dataSet = openFile.active
             activeSheet = dataSet.title
             relativePath = file[file.rindex("/")+1:]
             seriesRef = "[{}]{}".format(relativePath,activeSheet)
-            chart1 = workbook.add_chart({'type': 'scatter'})
-            print(seriesRef)
-           
-            chart1.add_series({
-                'name':       [f"{seriesRef}", 0, 2],
-                'categories': [f"{seriesRef}", 1, 0, dataSet.max_row, 0],
-                'values':     [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
-            })
+            columnList = ["E","M"]
+            scCount = 0
 
+            fileBreakdown.write_column('A1', summaryList)
 
-
-        # Add a chart title 
-            chart1.set_title ({'name': '{}'.format(relativePath), 'name_font':
-            {'name':'Arial', 'size':10, 'bold':True},})
-            chart1.set_legend({'position': 'none'})
+            if "Cond" in file:
+                chart1 = workbook.add_chart({'type': 'scatter'})
+                print(seriesRef)
             
-            # Add x-axis label
-            chart1.set_x_axis({'name': 'Time (Sec)',
-              'major_gridlines': {'visible': True}})
-            
-            # Add y-axis label
-            chart1.set_y_axis({'name': 'I (mA/cm²)'})
-          
-            # add chart to the worksheet 
-            # the top-left corner of a chart 
-            # is anchored to cell E2 . 
-            fileBreakdown.insert_chart('E2', chart1)
-            openFile.close()
+                chart1.add_series({
+                    'name':       [f"{seriesRef}", 0, 2],
+                    'categories': [f"{seriesRef}", 1, 0, dataSet.max_row, 0],
+                    'values':     [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
+                }) 
+                chart1.set_title ({'name': '{}'.format(relativePath), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
+                chart1.set_legend({'position': 'none'})
+                chart1.set_x_axis({'name': 'Time (Sec)', 'major_gridlines': {'visible': True}})
+                chart1.set_y_axis({'name': 'I (mA/cm²)'})
+                condPlots.insert_chart('{}{}'.format(columnList[self.condLetterCount%2],self.condCount), chart1)
+                if self.condLetterCount%2 == 0 :
+                    self.condLetterCount += 1
+                else:
+                    self.condCount += 17
+                    self.condLetterCount += 1
+
+                openFile.close()
+
+                if "SC" in file:
+                    chart1 = workbook.add_chart({'type': 'scatter'})
+                    print(seriesRef)
+                
+                    chart1.add_series({
+                        'name':       [f"{seriesRef}", 0, 2],
+                        'categories': [f"{seriesRef}", 1, 0, dataSet.max_row, 0],
+                        'values':     [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
+                    }) 
+                    chart1.set_title ({'name': '{}'.format(relativePath), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
+                    chart1.set_legend({'position': 'none'})
+                    chart1.set_x_axis({'name': 'Time (Sec)', 'major_gridlines': {'visible': True}})
+                    chart1.set_y_axis({'name': 'I (mA/cm²)'})
+                    scPlots.insert_chart('{}{}'.format(columnList[self.scLetterCount%2],self.scCount), chart1)
+                    if self.scLetterCount%2 == 0 :
+                        self.scLetterCount += 1
+                    else:
+                        self.scCount += 17
+                        self.scLetterCount += 1
+
+                    openFile.close()
         workbook.close()
 
 class MainWindow(QMainWindow):
