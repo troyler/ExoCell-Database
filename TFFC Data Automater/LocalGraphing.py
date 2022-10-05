@@ -91,6 +91,7 @@ class AnotherWindow(QWidget):
             self.layout.addWidget(self.finalButton)
     
     def extractingGraphs(self):
+        
         workbook = xlsxwriter.Workbook('{}{}_Summary_File.xlsx'.format(self.longPath,self.sumName))
         workbook.add_worksheet("File Breakdown")
         workbook.add_worksheet("Conditioning Plots")
@@ -105,7 +106,7 @@ class AnotherWindow(QWidget):
             dataSet = openFile.active
             activeSheet = dataSet.title
             relativePath = file[file.rindex("/")+1:]
-            seriesRef = "[{}]{}".format(relativePath,activeSheet)
+            seriesRef = "\'[{}]{}\'".format(relativePath,activeSheet)
             columnList = ["E","M"]
             scCount = 0
 
@@ -116,13 +117,27 @@ class AnotherWindow(QWidget):
               #  print(seriesRef)
             
                 chart1.add_series({
-                    'name':       [f"{seriesRef}", 2, 2],
-                    'categories': [f"{seriesRef}", 3, 0, dataSet.max_row, 0],
-                    'values':     [f"{seriesRef}", 3, 2, dataSet.max_row, 2],
+                    'name':       [f"{seriesRef}", 1, 0],
+                    'categories': [f"{seriesRef}", 4, 0, dataSet.max_row, 0],
+                    'values':     [f"{seriesRef}", 4, 2, dataSet.max_row, 2],
                     'marker':     {'type': 'diamond', 'size': 4},
                 }) 
                 chart1.set_title ({'name': '{}'.format(relativePath[0:-5]), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
-                chart1.set_legend({'position': 'none'})
+                chart1.set_legend({'layout': {
+        'x':      0.1,
+        'y':      0.14,
+        "width" : 0.8,
+        "height" : 0.1
+
+    }})
+             
+                chart1.set_plotarea({
+    'layout': {
+        'x':      0.13,
+        'y':      0.24,
+        'width':  0.8,
+        'height': 0.60,
+    }})
                 chart1.set_x_axis({'name': 'Time (Sec)', 'major_gridlines': {'visible': True}})
                 chart1.set_y_axis({'name': 'I (mA/cm²)'})
                 condPlots.insert_chart('{}{}'.format(columnList[self.condLetterCount%2],self.condCount), chart1)
@@ -139,15 +154,29 @@ class AnotherWindow(QWidget):
              #   print(seriesRef)
             
                 chart1.add_series({
-                    'name':       [f"{seriesRef}", 2, 2],
-                    'categories': [f"{seriesRef}", 3, 2, dataSet.max_row, 2],
-                    'values':     [f"{seriesRef}", 3, 5, dataSet.max_row, 5],
+                    'name':       [f"{seriesRef}", 1, 0],
+                    'categories': [f"{seriesRef}", 4, 2, dataSet.max_row, 2],
+                    'values':     [f"{seriesRef}", 4, 5, dataSet.max_row, 5],
                     'marker':     {'type': 'diamond', 'size': 4},
                 }) 
                 chart1.set_title ({'name': '{}'.format(relativePath[0:-5]), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
-                chart1.set_legend({'position': 'none'})
+                chart1.set_legend({'layout': {
+        'x':      0.1,
+        'y':      0.14,
+        "width" : 0.8,
+        "height" : 0.1
+
+    }})
+             
                 chart1.set_x_axis({'name': 'I (mA/cm²)', 'major_gridlines': {'visible': True}})
                 chart1.set_y_axis({'name': 'E_Stack (V)'})
+                chart1.set_plotarea({
+    'layout': {
+        'x':      0.13,
+        'y':      0.24,
+        'width':  0.8,
+        'height': 0.60,
+    }})
                 scPlots.insert_chart('{}{}'.format(columnList[self.scLetterCount%2],self.scCount), chart1)
                 if self.scLetterCount%2 == 0 :
                     self.scLetterCount += 1
@@ -159,15 +188,28 @@ class AnotherWindow(QWidget):
               #  print(seriesRef)
             
                 chart2.add_series({
-                    'name':       [f"{seriesRef}", 2, 2],
-                    'categories': [f"{seriesRef}", 3, 2, dataSet.max_row, 2],
-                    'values':     [f"{seriesRef}", 3, 4, dataSet.max_row, 4],
+                    'name':       [f"{seriesRef}", 1, 0],
+                    'categories': [f"{seriesRef}", 4, 2, dataSet.max_row, 2],
+                    'values':     [f"{seriesRef}", 4, 4, dataSet.max_row, 4],
                     'marker':     {'type': 'diamond', 'size': 4},
                 }) 
                 chart2.set_title ({'name': '{}'.format(relativePath[0:-5]), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
-                chart2.set_legend({'position': 'none'})
+                chart2.set_legend({'layout': {
+        'x':      0.1,
+        'y':      0.14,
+        "width" : 0.8,
+        "height" : 0.1
+
+    }})
                 chart2.set_x_axis({'name': 'I (mA/cm²)', 'major_gridlines': {'visible': True}})
                 chart2.set_y_axis({'name': 'Power (mW/cmÂ²)'})
+                chart2.set_plotarea({
+    'layout': {
+        'x':      0.13,
+        'y':      0.24,
+        'width':  0.8,
+        'height': 0.60,
+    }})
                 scPlots.insert_chart('{}{}'.format(columnList[self.scLetterCount%2],self.scCount), chart2)
 
                 if self.scLetterCount%2 == 0 :
@@ -193,6 +235,7 @@ class MainWindow(QMainWindow):
         self.button.clicked.connect(lambda: self.show_new_window(self.saveLocation))
 
         self.msg = QtWidgets.QMessageBox()
+        self.msg.setWindowTitle("Error")
 
         self.chooseSaveLocationButton = QtWidgets.QPushButton("Press to choose save location")
         self.chooseSaveLocationButton.clicked.connect(lambda: self.saveLocation())
@@ -356,7 +399,7 @@ class MainWindow(QMainWindow):
         self.fileTableBreak.setColumnCount(len(self.horizontalHeaders))
         self.fileTableBreak.setRowCount(len(currentDirectoryList))
         while x < len(currentDirectoryList):
-            try1 = currentDirectoryList.sort(key = itemgetter(1))
+            currentDirectoryList.sort(key = itemgetter(1))
             fileKey = currentDirectoryList[x][2]
             self.fileTableBreak.setHorizontalHeaderLabels(self.horizontalHeaders)
             self.fileTableBreak.setItem(x,0,QTableWidgetItem(namingConv[fileKey]["Cell Test Number"]))
@@ -385,17 +428,20 @@ class MainWindow(QMainWindow):
             for line in workingFile:              #for each line in this file 
                 dataInfo = line.strip().split('\t')     #strip this line of unneeded info and split it by tab. Returns a list of each item split
                 if "Time:" in dataInfo[0] and ("Date" not in dataInfo[0]) and ("Slope" not in dataInfo[0]):
+                    dates = []
                     time = dataInfo[0]
-                    timeData = time.split(":", maxsplit=1)
-                    
-           
+                    self.dateString = time.split(":", maxsplit=1)
+                    print(self.dateString)
+                    for x in self.dateString:
+                        dates.append(x.strip())
+
                 if len(dataInfo) > 10 and dataInfo[0]=="Time (Sec)":  #if the len of the list is greather than ten
                     cleanData.append(dataInfo)
                 elif len(dataInfo) > 10:
                     dataInfo = list(map(float,dataInfo))
                     cleanData.append(dataInfo) 
             if cleanData[0][0] == "Time (Sec)" : 
-                    fileDictionary[name] = (pd.DataFrame(cleanData[1:], columns=cleanData[0]), pd.DataFrame([timeData[1]], columns = [timeData[0]]))
+                    fileDictionary[name] = (pd.DataFrame(cleanData[1:], columns=cleanData[0]), pd.DataFrame([dates[1]], columns = [dates[0]]))
                     self.occurence = fileDictionary[name]
                     print(fileDictionary)
 
@@ -413,7 +459,7 @@ class MainWindow(QMainWindow):
             with pd.ExcelWriter(f"{self.locationPath}/{currentFileName}.xlsx") as writer:
                 writer.if_sheet_exists = 'replace'
                 fileDictionary[currentFileName][1].to_excel(writer, sheet_name = f"{currentFileName[0:25]}", engine="xlsxwriter", index = False, startrow = 0)
-                fileDictionary[currentFileName][0].to_excel(writer, sheet_name = f"{currentFileName[0:25]}", engine="xlsxwriter", index = False, startrow = 2)
+                fileDictionary[currentFileName][0].to_excel(writer, sheet_name = f"{currentFileName[0:25]}", engine="xlsxwriter", index = False, startrow = 3)
                 self.saveLocationStamp.setText(f"Saving {currentFileName} to")
                 writer.save()
              #   print("saving")
