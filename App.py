@@ -1,4 +1,5 @@
 import sys
+from fileInformer import fileInfo, sc_tests, OCV_tests, cond_tests
 import re
 from distutils.filelist import FileList
 from operator import itemgetter
@@ -14,7 +15,7 @@ import openpyxl
 import xlsxwriter
 import os
 
-
+test_files = {}
 xlsxFiles = []
 fileDictionary = {}
 currentDirectoryList =[]
@@ -240,6 +241,7 @@ class MainWindow(QMainWindow):
         widget = QWidget()
         widget.setLayout(self.horizontalLayout)
         self.setCentralWidget(widget)
+        self.fname = QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "FCD Files (*.fcd)")[0] #tuple ([list of strings], string)
         self.popups = []
         
        # self.fileViewerFunc()
@@ -255,108 +257,14 @@ class MainWindow(QMainWindow):
             self.w = None  # Discard reference.
 
     def use_regex(self,input_text):
-        pattern = re.compile(r"\d_[A-Za-z0-9]+_[A-Za-z0-9]+_[0-9]*\.[0-9]+[a-zA-Z]+_([A-Za-z0-9]+( [A-Za-z0-9]+)+)_([+-]?(?=\.\d|\d)(?:\d+)?(?:\.?\d*))(?:[eE]([+-]?\d+))?(\s([A-Za-z0-9]+\s)+)[A-Za-z0-9]+_([0-9]+(-[0-9]+)+)", re.IGNORECASE)
+        pattern = re.compile(r"[0-9]_[A-Za-z0-9]+_[A-Za-z0-9]+_[0-9]*\.[0-9]+[a-zA-Z]+_([A-Za-z0-9]+( [A-Za-z0-9]+)+)_([+-]?(?=\.\d|\d)(?:\d+)?(?:\.?\d*))(?:[eE]([+-]?\d+))?(\s([A-Za-z0-9]+\s)+)[A-Za-z0-9]+_([0-9]+(-[0-9]+)+)", re.IGNORECASE)
         print(pattern.match(input_text))
         return pattern.match(input_text)
 
 
     
 #function to bring in file paths as strings in a list
-    def fileChooser(self):   
-        fname = QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "FCD Files (*.fcd)") #tuple ([list of strings], string)
-        for file in fname[0]:
-            self.fileTitle = file[file.rindex('/')+1:-4]   #for each file in self.fname[0], where the list of file paths is held
-            if file not in fileList:   #checking to make sure current file path is not in list to hold filepaths
-                self.use_regex(self.fileTitle)
-                temp_file_path = " "
-                temp_name = " "
-                temp_file_type = ""
-                temp_test_number = ""
-                temp_date = ""
-                temp_other = ""
-                try:
-                    temp_file_path = self.fileTitle.split("_")
-                    if temp_file_path[0].isdigit() and len(temp_file_path[0]) <= 2 and temp_file_path[2].isdigit() == False:
-                        self.temp_test_number = self.fileData[0]
-                        temp_name = temp_file_path[1]
-                        temp_date = temp_file_path[-1]
-                        temp_other = "".join(self.fileData[3:-1])
-                        testTypeCount = self.fileData[2]
-                        print(testTypeCount)
-                        if len(temp_name) == 8:
-                            fileList.append(file)
-                            print(fileList)
-                            currentDirectoryList.append((file, temp_test_number, temp_file_path))
-                            if "SC" or "Cond" or "OCV" in testTypeCount and len(testTypeCount) <=6:
-                                namingConv[self.fileTitle] = {"Cell ID" : temp_name,
-                                                                "Test Iteration" : testTypeCount,
-                                                                "Other Info" : otherInfo,
-                                                                "File Location" : file,
-                                                                "File Title": temp_file_path,
-                                                                "Cell Test Number" : temp_test_number,
-                                                                "Test Date" : temp_date}
-                                print(temp_name, testTypeCount, self.temp_test_number, otherInfo)
-                                self.fileListWidget.addItem(self.fileTitle)
-                                #print(namingConv)
-                                currentDirectoryList.sort(key=itemgetter(1))
-                                #print(currentDirectoryList)
-                                self.fileViewerFunc()
-
-                            else:
-                                self.msg.setText(f"{self.fileTitle} was not an OCV, SC, or Cond file")
-                                self.msg.exec_()  
-                        else:
-                            self.msg.setText(f"{self.fileTitle} had improper naming convention and was removed")
-                            self.msg.exec_() 
-                        
-
-                    else:
-                        print(self.fileTitle)
-                        fileSplit = self.fileTitle.split("_")
-                        number = fileSplit[-1]
-                        print(number)
-                        self.dateData = fileSplit[0:3]
-                        temp_date = "/".join(self.dateData)
-                        print(fileSplit)   
-                        if len(fileSplit[3]) >= 6 and len(fileSplit[3]) <= 10:
-                            fileList.append(file)
-                            currentDirectoryList.append((file, number, self.fileTitle))
-                            temp_name = fileSplit[3]
-                            testTypeCount = fileSplit[4].replace(" ", "")
-                            print(testTypeCount)
-                            if "SC" or "Cond" or "OCV" in testTypeCount and len(testTypeCount) <=6:
-                                temp_test_number = fileSplit[-1]
-                                otherInfo = " ".join(fileSplit[4:-1])
-                                namingConv[self.fileTitle] = {"Cell ID" : temp_name,
-                                                                "Test Iteration" : testTypeCount,
-                                                                "Other Info" : otherInfo,
-                                                                "File Location" : file,
-                                                                "File Title": self.fileTitle,
-                                                                "Cell Test Number" : temp_test_number,
-                                                                "Test Date" : temp_date}
-                                print(temp_name, testTypeCount, temp_test_number, otherInfo)
-                                self.fileListWidget.addItem(self.fileTitle)
-                                #print(namingConv)
-                                currentDirectoryList.sort(key=itemgetter(1))
-                                #print(currentDirectoryList)
-                                self.fileViewerFunc()
-
-                            else:
-                                self.msg.setText(f"{self.fileTitle} was not an OCV, SC, or Cond file")
-                                self.msg.exec_()  
-                        else:
-                            self.msg.setText(f"{self.fileTitle} had improper naming convention and was removed")
-                            self.msg.exec_() 
-                        
-                except IndexError:     
-                    self.msg.setText(f"{self.fileTitle} had improper naming convention and was removed")
-                    self.msg.exec_() 
-                    continue
-            else: 
-               self.msg.setText(f"{self.fileTitle} already selected")
-               self.msg.exec_()
-               continue 
-               # return
+    
 
 
 
