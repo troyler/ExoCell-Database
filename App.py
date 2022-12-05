@@ -1,4 +1,5 @@
 import sys
+import re
 from distutils.filelist import FileList
 from operator import itemgetter
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableWidgetItem
@@ -253,7 +254,11 @@ class MainWindow(QMainWindow):
             self.w.close()  # Close window.
             self.w = None  # Discard reference.
 
-    
+    def use_regex(self,input_text):
+        pattern = re.compile(r"\d_[A-Za-z0-9]+_[A-Za-z0-9]+_[0-9]*\.[0-9]+[a-zA-Z]+_([A-Za-z0-9]+( [A-Za-z0-9]+)+)_([+-]?(?=\.\d|\d)(?:\d+)?(?:\.?\d*))(?:[eE]([+-]?\d+))?(\s([A-Za-z0-9]+\s)+)[A-Za-z0-9]+_([0-9]+(-[0-9]+)+)", re.IGNORECASE)
+        print(pattern.match(input_text))
+        return pattern.match(input_text)
+
 
     
 #function to bring in file paths as strings in a list
@@ -262,31 +267,35 @@ class MainWindow(QMainWindow):
         for file in fname[0]:
             self.fileTitle = file[file.rindex('/')+1:-4]   #for each file in self.fname[0], where the list of file paths is held
             if file not in fileList:   #checking to make sure current file path is not in list to hold filepaths
+                self.use_regex(self.fileTitle)
+                temp_file_path = " "
+                temp_name = " "
+                temp_file_type = ""
+                temp_test_number = ""
+                temp_date = ""
+                temp_other = ""
                 try:
-                    self.fileType = self.fileTitle.split("_")
-                    if self.fileType[0].isdigit() and len(self.fileType[0]) <= 2 and self.fileType[2].isdigit() == False:
-                        self.fileData = self.fileType
-                        print(self.fileData)
-                        print(self.fileType)
-                        self.cellTestNumber = self.fileData[0]
-                        cellName = self.fileData[1]
-                        self.testDate = self.fileData[-1]
-                        otherInfo = "".join(self.fileData[3:-1])
+                    temp_file_path = self.fileTitle.split("_")
+                    if temp_file_path[0].isdigit() and len(temp_file_path[0]) <= 2 and temp_file_path[2].isdigit() == False:
+                        self.temp_test_number = self.fileData[0]
+                        temp_name = temp_file_path[1]
+                        temp_date = temp_file_path[-1]
+                        temp_other = "".join(self.fileData[3:-1])
                         testTypeCount = self.fileData[2]
                         print(testTypeCount)
-                        if len(cellName) == 8:
+                        if len(temp_name) == 8:
                             fileList.append(file)
                             print(fileList)
-                            currentDirectoryList.append((file, self.cellTestNumber, self.fileTitle))
+                            currentDirectoryList.append((file, temp_test_number, temp_file_path))
                             if "SC" or "Cond" or "OCV" in testTypeCount and len(testTypeCount) <=6:
-                                namingConv[self.fileTitle] = {"Cell ID" : cellName,
+                                namingConv[self.fileTitle] = {"Cell ID" : temp_name,
                                                                 "Test Iteration" : testTypeCount,
                                                                 "Other Info" : otherInfo,
                                                                 "File Location" : file,
-                                                                "File Title": self.fileTitle,
-                                                                "Cell Test Number" : self.cellTestNumber,
-                                                                "Test Date" : self.testDate}
-                                print(cellName, testTypeCount, self.cellTestNumber, otherInfo)
+                                                                "File Title": temp_file_path,
+                                                                "Cell Test Number" : temp_test_number,
+                                                                "Test Date" : temp_date}
+                                print(temp_name, testTypeCount, self.temp_test_number, otherInfo)
                                 self.fileListWidget.addItem(self.fileTitle)
                                 #print(namingConv)
                                 currentDirectoryList.sort(key=itemgetter(1))
@@ -307,25 +316,25 @@ class MainWindow(QMainWindow):
                         number = fileSplit[-1]
                         print(number)
                         self.dateData = fileSplit[0:3]
-                        self.testDate = "/".join(self.dateData)
+                        temp_date = "/".join(self.dateData)
                         print(fileSplit)   
                         if len(fileSplit[3]) >= 6 and len(fileSplit[3]) <= 10:
                             fileList.append(file)
                             currentDirectoryList.append((file, number, self.fileTitle))
-                            cellName = fileSplit[3]
+                            temp_name = fileSplit[3]
                             testTypeCount = fileSplit[4].replace(" ", "")
                             print(testTypeCount)
                             if "SC" or "Cond" or "OCV" in testTypeCount and len(testTypeCount) <=6:
-                                cellTestNumber = fileSplit[-1]
+                                temp_test_number = fileSplit[-1]
                                 otherInfo = " ".join(fileSplit[4:-1])
-                                namingConv[self.fileTitle] = {"Cell ID" : cellName,
+                                namingConv[self.fileTitle] = {"Cell ID" : temp_name,
                                                                 "Test Iteration" : testTypeCount,
                                                                 "Other Info" : otherInfo,
                                                                 "File Location" : file,
                                                                 "File Title": self.fileTitle,
-                                                                "Cell Test Number" : cellTestNumber,
-                                                                "Test Date" : self.testDate}
-                                print(cellName, testTypeCount, cellTestNumber, otherInfo)
+                                                                "Cell Test Number" : temp_test_number,
+                                                                "Test Date" : temp_date}
+                                print(temp_name, testTypeCount, temp_test_number, otherInfo)
                                 self.fileListWidget.addItem(self.fileTitle)
                                 #print(namingConv)
                                 currentDirectoryList.sort(key=itemgetter(1))
