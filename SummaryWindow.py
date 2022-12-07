@@ -16,12 +16,11 @@ import matplotlib.pyplot as plt
 import openpyxl
 import xlsxwriter
 import os
+from xlsxUtil import get_XLSX_in_table
 
 
 summaryList = ["Files graphed in this sheet", "    "]
 xlsxFiles = []
-   
-
 
 class AnotherWindow(QWidget):
 
@@ -37,6 +36,7 @@ class AnotherWindow(QWidget):
         self.condLetterCount = 2
         self.scCount = 6
         self.scLetterCount = 2
+        self.longPath = ""
         self.selectMsg = QtWidgets.QMessageBox()
         self.setWindowTitle("Graphing XLSX Files")
 
@@ -54,19 +54,18 @@ class AnotherWindow(QWidget):
         self.layout.addWidget(self.xlsxButton)
         self.layout.addWidget(self.btn)
 
-    def getXLSXinTable (self):
+    def  getXLSXinTable(self):
         x= 0
         try:
             saveLocation =  QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "Excel Files (*.xlsx)") #tuple ([list of strings], string)
+            print("save location: " , saveLocation ,"\n")
             self.longPath = saveLocation[0][0][:saveLocation[0][0].rindex("/")+1]
-            self.pathStep = self.longPath.split("/")
-            self.relativePath = saveLocation[0][0][saveLocation[0][0].rindex("/")+1:]
+            print(self.longPath)
         except IndexError:     
             self.selectMsg.setText("Error, must choose files")
             self.selectMsg.exec_()
             return
              
-
         for each in saveLocation[0]:
             if ".DS_Store" in each:
                 saveLocation.remove(".DS_Store")

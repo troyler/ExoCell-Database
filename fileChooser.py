@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableWidgetItem
 fileList = []
 test_files = {}
 
-def file_chooser(folder, widget):     
+def file_chooser(folder):     
     for file in folder:
         if file != '.DS_Store':
             if "/" in file: 
@@ -30,7 +30,7 @@ def file_chooser(folder, widget):
                     temp_test_name = temp_file_path[2]
                     temp_test_number = temp_file_path[0]            #updating temp values 
                     temp_other = " ".join(temp_file_path[3:-1])
-                    temp_date = temp_file_path[-1][:-4]
+                    temp_date = temp_file_path[-1]
                     temp_location = file
                     if len(temp_cell_id) == 8:    #checking format
                         fileList.append(file)
@@ -47,11 +47,9 @@ def file_chooser(folder, widget):
                                 temp_test_type  = "OCV"
                                 test = OCV_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_excel_sheet)
                                 test_files[test.file_path] = test
-                        widget.addItem(fileTitle)
+                       
 
     return test_files
-
-
 
 
 def fileViewerFunc(test_files, widget):
@@ -89,3 +87,8 @@ def fileAnalyzer(incoming, name):
                     cleanData.append(dataInfo) 
             if cleanData[0][0] == "Time (Sec)" : 
                     name.excel_sheet = pd.DataFrame(cleanData[1:], columns=cleanData[0])
+
+
+
+
+

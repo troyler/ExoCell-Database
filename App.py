@@ -2,7 +2,6 @@ import sys
 from fileInformer import fileInfo, sc_tests, OCV_tests, cond_tests
 import re
 from distutils.filelist import FileList
-from operator import itemgetter
 from fileChooser import file_chooser, fileViewerFunc, fileAnalyzer
 from SummaryWindow import AnotherWindow
 from fileInformer import OCV_tests,sc_tests,cond_tests,fileInfo
@@ -12,10 +11,6 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import xlsxwriter
-import os
 
 test_files = {}
 xlsxFiles = []
@@ -91,14 +86,19 @@ class MainWindow(QMainWindow):
     def show_new_window(self):
         w = AnotherWindow()
         w.show()
-
-
     
 #function to bring in file paths as strings in a list
 
     def file_open(self):
         fname = QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "FCD Files (*.fcd)")[0] #tuple ([list of strings], string)
-        result = file_chooser(fname, self.fileListWidget)
+        result = file_chooser(fname)
+        x = 0
+        file_objects = list(result.values())  #file_path, cell_id, test_name, test_type, test_number, test_date, other
+        while x < len(file_objects):
+            file = file_objects[x]
+            self.fileListWidget.addItem(file.file_path)
+            print(file)
+            x+=1
         test_files.update(result)
         fileViewerFunc(test_files, self.fileTableBreak)
         print(result)
@@ -109,6 +109,8 @@ class MainWindow(QMainWindow):
         file_objects = list(test_files.values())  #file_path, cell_id, test_name, test_type, test_number, test_date, other
         while x < len(file_objects):
             file = file_objects[x]
+            print(file)
+            print(file.file_path)
             fileAnalyzer(test_files.get(file.file_path).location, test_files.get(file.file_path))
             x += 1
         self.writingToExcel()
