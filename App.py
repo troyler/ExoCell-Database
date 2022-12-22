@@ -91,30 +91,31 @@ class MainWindow(QMainWindow):
 
     def file_open(self):
         fname = QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "FCD Files (*.fcd)")[0] #tuple ([list of strings], string)
-        result = file_chooser(fname)
-        x = 0
+        result = file_chooser(fname, self.msg)
+        self.fileListWidget.clear()
+        x = 0  #make verbose names for variables for high readability and obvious purpose identification 
         file_objects = list(result.values())  #file_path, cell_id, test_name, test_type, test_number, test_date, other
         while x < len(file_objects):
             file = file_objects[x]
             self.fileListWidget.addItem(file.file_path)
-            print(file)
             x+=1
         test_files.update(result)
         fileViewerFunc(test_files, self.fileTableBreak)
-        print(result)
         return result
 
     def fileRunner(self, test_files):
         x = 0
-        file_objects = list(test_files.values())  #file_path, cell_id, test_name, test_type, test_number, test_date, other
+        file_objects = list(test_files.values())  
         while x < len(file_objects):
             file = file_objects[x]
             print(file)
             print(file.file_path)
-            fileAnalyzer(test_files.get(file.file_path).location, test_files.get(file.file_path))
+            fileAnalyzer(test_files.get(file.file_path).location, test_files.get(file.file_path), test_files)
             x += 1
         self.writingToExcel()
+        
         self.fileViewerLayout.addWidget(self.button)
+        #initial_current_density(test_files)
 
     def saveLocation(self):
         self.locationPath = QtWidgets.QFileDialog.getExistingDirectory(self, "Open file") #tuple ([list of strings], string)
