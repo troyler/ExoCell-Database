@@ -108,8 +108,6 @@ class MainWindow(QMainWindow):
         file_objects = list(test_files.values())  
         while x < len(file_objects):
             file = file_objects[x]
-            print(file)
-            print(file.file_path)
             fileAnalyzer(test_files.get(file.file_path).location, test_files.get(file.file_path), test_files)
             x += 1
         self.writingToExcel()
