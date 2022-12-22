@@ -7,7 +7,7 @@ import re
 
 from App import *
 from fileInformer import fileInfo,sc_tests,OCV_tests,cond_tests
-from fileChooser import file_chooser
+from fileChooser import file_chooser,fileAnalyzer
 
 
 
@@ -17,7 +17,6 @@ class TestForErrors(unittest.TestCase):
     def testFolder(self):
         folder = os.listdir("/Users/tyler/Desktop/ExoCell/FCD Files")
         result = file_chooser(folder)
-        print(result)
         for each in folder:
             thisPass = result.get(each)
             if "None" not in thisPass.__str__() :
