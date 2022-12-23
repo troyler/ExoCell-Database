@@ -2,7 +2,7 @@ import sys
 from fileInformer import fileInfo, sc_tests, OCV_tests, cond_tests
 import re
 from distutils.filelist import FileList
-from fileChooser import file_chooser, fileViewerFunc, fileAnalyzer
+from fileChooser import file_chooser, fileViewerFunc, fileAnalyzer, get_steadyState_current
 from SummaryWindow import AnotherWindow
 from fileInformer import OCV_tests,sc_tests,cond_tests,fileInfo
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableWidgetItem
@@ -110,6 +110,17 @@ class MainWindow(QMainWindow):
             file = file_objects[x]
             fileAnalyzer(test_files.get(file.file_path).location, test_files.get(file.file_path), test_files)
             x += 1
+
+        checksum = 0
+        for file in file_objects:
+            if file.is_cond():
+                checksum += 1
+
+        if checksum == len(test_files):
+            get_steadyState_current(test_files, checksum)    
+
+
+
         self.writingToExcel()
         
         self.fileViewerLayout.addWidget(self.button)

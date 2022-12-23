@@ -123,6 +123,7 @@ def get_steadyState_current(test_files, temp_test_number):
     while counter < len(file_objects):
         file = file_objects[counter]
         if int(test_files.get(file.file_path).test_number) == temp_test_number:
+            test_files.get(file.file_path).get_ss_current_density()
             test_files.get(file.file_path).get_ss_current()
             break
         else:
