@@ -57,7 +57,6 @@ class AnotherWindow(QWidget):
         self.layout.addWidget(self.btn)
 
     def  getXLSXinTable(self):
-        print(self.info)
         x= 0
         try:
             saveLocation =  QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "Excel Files (*.xlsx)") #tuple ([list of strings], string)
@@ -104,7 +103,7 @@ class AnotherWindow(QWidget):
             dataSet = openFile.active
             activeSheet = dataSet.title
             relativePath = file[file.rindex("/")+1:]
-            seriesRef = "[{}]{}".format(relativePath,activeSheet)
+            seriesRef = "\'[{}]{}\'".format(relativePath,activeSheet)
             columnList = ["E","M"]
             scCount = 0
 
@@ -112,16 +111,30 @@ class AnotherWindow(QWidget):
 
             if "Cond" in file and "SC" not in file:
                 chart1 = workbook.add_chart({'type': 'scatter'})
-                print(seriesRef)
+              #  print(seriesRef)
             
                 chart1.add_series({
-                    'name':       [f"{seriesRef}", 0, 2],
-                    'categories': [f"{seriesRef}", 1, 0, dataSet.max_row, 0],
-                    'values':     [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
+                    'name':       [f"{seriesRef}", 1, 0],
+                    'categories': [f"{seriesRef}", 4, 0, dataSet.max_row, 0],
+                    'values':     [f"{seriesRef}", 4, 2, dataSet.max_row, 2],
                     'marker':     {'type': 'diamond', 'size': 4},
                 }) 
                 chart1.set_title ({'name': '{}'.format(relativePath[0:-5]), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
-                chart1.set_legend({'position': 'none'})
+                chart1.set_legend({'layout': {
+        'x':      0.1,
+        'y':      0.14,
+        "width" : 0.8,
+        "height" : 0.1
+
+    }})
+             
+                chart1.set_plotarea({
+    'layout': {
+        'x':      0.13,
+        'y':      0.24,
+        'width':  0.8,
+        'height': 0.60,
+    }})
                 chart1.set_x_axis({'name': 'Time (Sec)', 'major_gridlines': {'visible': True}})
                 chart1.set_y_axis({'name': 'I (mA/cm²)'})
                 condPlots.insert_chart('{}{}'.format(columnList[self.condLetterCount%2],self.condCount), chart1)
@@ -135,18 +148,32 @@ class AnotherWindow(QWidget):
 
             elif "SC" in file:
                 chart1 = workbook.add_chart({'type': 'scatter'})
-                print(seriesRef)
+             #   print(seriesRef)
             
                 chart1.add_series({
-                    'name':       [f"{seriesRef}", 0, 2],
-                    'categories': [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
-                    'values':     [f"{seriesRef}", 1, 5, dataSet.max_row, 5],
+                    'name':       [f"{seriesRef}", 1, 0],
+                    'categories': [f"{seriesRef}", 4, 2, dataSet.max_row, 2],
+                    'values':     [f"{seriesRef}", 4, 5, dataSet.max_row, 5],
                     'marker':     {'type': 'diamond', 'size': 4},
                 }) 
                 chart1.set_title ({'name': '{}'.format(relativePath[0:-5]), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
-                chart1.set_legend({'position': 'none'})
+                chart1.set_legend({'layout': {
+        'x':      0.1,
+        'y':      0.14,
+        "width" : 0.8,
+        "height" : 0.1
+
+    }})
+             
                 chart1.set_x_axis({'name': 'I (mA/cm²)', 'major_gridlines': {'visible': True}})
                 chart1.set_y_axis({'name': 'E_Stack (V)'})
+                chart1.set_plotarea({
+    'layout': {
+        'x':      0.13,
+        'y':      0.24,
+        'width':  0.8,
+        'height': 0.60,
+    }})
                 scPlots.insert_chart('{}{}'.format(columnList[self.scLetterCount%2],self.scCount), chart1)
                 if self.scLetterCount%2 == 0 :
                     self.scLetterCount += 1
@@ -155,18 +182,31 @@ class AnotherWindow(QWidget):
                     self.scLetterCount += 1
 
                 chart2 = workbook.add_chart({'type': 'scatter'})
-                print(seriesRef)
+              #  print(seriesRef)
             
                 chart2.add_series({
-                    'name':       [f"{seriesRef}", 0, 2],
-                    'categories': [f"{seriesRef}", 1, 2, dataSet.max_row, 2],
-                    'values':     [f"{seriesRef}", 1, 4, dataSet.max_row, 4],
+                    'name':       [f"{seriesRef}", 1, 0],
+                    'categories': [f"{seriesRef}", 4, 2, dataSet.max_row, 2],
+                    'values':     [f"{seriesRef}", 4, 4, dataSet.max_row, 4],
                     'marker':     {'type': 'diamond', 'size': 4},
                 }) 
                 chart2.set_title ({'name': '{}'.format(relativePath[0:-5]), 'name_font': {'name':'Arial', 'size':10, 'bold':True},})
-                chart2.set_legend({'position': 'none'})
+                chart2.set_legend({'layout': {
+        'x':      0.1,
+        'y':      0.14,
+        "width" : 0.8,
+        "height" : 0.1
+
+    }})
                 chart2.set_x_axis({'name': 'I (mA/cm²)', 'major_gridlines': {'visible': True}})
                 chart2.set_y_axis({'name': 'Power (mW/cmÂ²)'})
+                chart2.set_plotarea({
+    'layout': {
+        'x':      0.13,
+        'y':      0.24,
+        'width':  0.8,
+        'height': 0.60,
+    }})
                 scPlots.insert_chart('{}{}'.format(columnList[self.scLetterCount%2],self.scCount), chart2)
 
                 if self.scLetterCount%2 == 0 :

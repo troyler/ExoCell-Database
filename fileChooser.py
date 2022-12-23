@@ -98,7 +98,13 @@ def fileAnalyzer(incoming, name, test_files, keyCriteria): #feeder to be used as
         with open(incoming, "r", encoding='latin_1') as workingFile: #opening and reading the incoming file as workingFile
             cleanData = []  #opening and reading the incoming file as workingFile
             for line in workingFile:              #for each line in this file 
-                dataInfo = line.strip().split('\t')     #strip this line of unneeded info and split it by tab. Returns a list of each item split
+                dataInfo = line.strip().split('\t')
+                if "Time:" in dataInfo[0] and ("Date" not in dataInfo[0]) and ("Slope" not in dataInfo[0]):
+                    dates = [] 
+                    time = dataInfo[0]
+                    dateString = time.split(":", maxsplit = 1)
+                    for x in dateString:
+                        dates.append(x.strip()) #strip this line of unneeded info and split it by tab. Returns a list of each item split
            #  # # # print(dataInfo)
                 if len(dataInfo) > 10 and dataInfo[0]=="Time (Sec)":  #if the len of the list is greather than ten
                     cleanData.append(dataInfo)
@@ -107,6 +113,7 @@ def fileAnalyzer(incoming, name, test_files, keyCriteria): #feeder to be used as
                     cleanData.append(dataInfo) 
             if cleanData[0][0] == "Time (Sec)" : 
                 name.excel_sheet = pd.DataFrame(cleanData[1:], columns=cleanData[0])
+                name.testing_time = pd.DataFrame([dates[1]], columns = [dates[0]])
             if name.test_name == "Cond2":
                 name.get_current_density()
                 keyCriteria["Initial Current Density"] = name.current_density

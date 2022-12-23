@@ -140,7 +140,8 @@ class MainWindow(QMainWindow):
                 currentFileName = file.file_path
                 with pd.ExcelWriter(f"{self.locationPath}/{currentFileName}.xlsx") as writer:
                     writer.if_sheet_exists = 'replace'
-                    test_files.get(file.file_path).excel_sheet.to_excel(writer, sheet_name = f"{currentFileName[0:25]}", engine="xlsxwriter", index = False)
+                    test_files.get(file.file_path).testing_time.to_excel(writer, sheet_name = f"{currentFileName[0:25]}", engine="xlsxwriter", index = False, startrow = 0)
+                    test_files.get(file.file_path).excel_sheet.to_excel(writer, sheet_name = f"{currentFileName[0:25]}", engine="xlsxwriter", index = False, startrow = 3)
                     self.saveLocationStamp.setText(f"Saving {currentFileName} to")
                     writer.save()
                     print("saving")
