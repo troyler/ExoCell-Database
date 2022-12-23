@@ -94,7 +94,7 @@ def fileViewerFunc(test_files, widget):
         x+=1
 
 
-def fileAnalyzer(incoming, name, test_files):
+def fileAnalyzer(incoming, name, test_files, keyCriteria): #feeder to be used as a select method potentially 
         with open(incoming, "r", encoding='latin_1') as workingFile: #opening and reading the incoming file as workingFile
             cleanData = []  #opening and reading the incoming file as workingFile
             for line in workingFile:              #for each line in this file 
@@ -109,22 +109,27 @@ def fileAnalyzer(incoming, name, test_files):
                 name.excel_sheet = pd.DataFrame(cleanData[1:], columns=cleanData[0])
             if name.test_name == "Cond2":
                 name.get_current_density()
-            if name.test_name == "SC1":
+                keyCriteria["Initial Current Density"] = name.current_density
+            if name.test_name == "SC1":   #feeder used to change option 
                 name.get_OCV()
+                keyCriteria["Startup OCV"] = name.startup_ocv
                 temp_test_number = int(name.test_number) - 1
-                get_steadyState_current(test_files, temp_test_number)
+                get_steadyState_current(test_files, temp_test_number, keyCriteria)
                 name.get_max_power_density()
 
 
 
-def get_steadyState_current(test_files, temp_test_number):
+def get_steadyState_current(test_files, temp_test_number, keyCriteria):
     counter = 0
     file_objects = list(test_files.values())  
     while counter < len(file_objects):
         file = file_objects[counter]
         if int(test_files.get(file.file_path).test_number) == temp_test_number:
-            test_files.get(file.file_path).get_ss_current_density()
-            test_files.get(file.file_path).get_ss_current()
+            fileHolder = test_files.get(file.file_path)
+            fileHolder.get_ss_current_density()
+            fileHolder.get_ss_current()
+            keyCriteria["Steady State Current"] = f"{fileHolder.ss_current} on file {fileHolder.test_name}"
+            keyCriteria["Steady State Current Density"] = f"{fileHolder.ss_current_density} on file {fileHolder.test_name}"
             break
         else:
             counter+=1

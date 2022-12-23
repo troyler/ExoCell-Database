@@ -28,7 +28,7 @@ class OCV_tests(fileInfo):
 
     def is_OCV(self):
         return True
-
+        
 
 class sc_tests(fileInfo):
     def __init__(self,file_path, cell_id, test_name, test_type, test_number, test_date, other, location, excel_sheet):
@@ -74,7 +74,7 @@ class cond_tests(fileInfo):
         else:
             current_density_column = self.excel_sheet.loc[360,"I (mA/cmÂ²)"]
         self.current_density = current_density_column
-        print("Initial Current Density" , self.current_density)
+        print("Initial Current Density" , self.test_name , self.current_density)
 
     def get_ss_current_density(self):
         self.ss_current_density = self.excel_sheet.loc[len(self.excel_sheet)-1,"I (mA/cmÂ²)"]

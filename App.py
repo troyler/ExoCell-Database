@@ -19,6 +19,7 @@ currentDirectoryList =[]
 fileList = []
 namingConv = {}
 summaryList = ["Files graphed in this sheet", "    "]
+keyCriteria = {}
 
 
 class MainWindow(QMainWindow):
@@ -84,7 +85,9 @@ class MainWindow(QMainWindow):
         return pattern.match(input_text)
 
     def show_new_window(self):
+        print(keyCriteria)
         w = AnotherWindow()
+        w.info = keyCriteria
         w.show()
     
 #function to bring in file paths as strings in a list
@@ -108,18 +111,15 @@ class MainWindow(QMainWindow):
         file_objects = list(test_files.values())  
         while x < len(file_objects):
             file = file_objects[x]
-            fileAnalyzer(test_files.get(file.file_path).location, test_files.get(file.file_path), test_files)
+            fileAnalyzer(test_files.get(file.file_path).location, test_files.get(file.file_path), test_files, keyCriteria)
             x += 1
-
         checksum = 0
         for file in file_objects:
             if file.is_cond():
                 checksum += 1
 
         if checksum == len(test_files):
-            get_steadyState_current(test_files, checksum)    
-
-
+            get_steadyState_current(test_files, checksum, keyCriteria)    
 
         self.writingToExcel()
         
@@ -137,7 +137,7 @@ class MainWindow(QMainWindow):
             x= 0
             while x < len(file_objects):
                 file = file_objects[x]
-                currentFileName =  file.file_path
+                currentFileName = file.file_path
                 with pd.ExcelWriter(f"{self.locationPath}/{currentFileName}.xlsx") as writer:
                     writer.if_sheet_exists = 'replace'
                     test_files.get(file.file_path).excel_sheet.to_excel(writer, sheet_name = f"{currentFileName[0:25]}", engine="xlsxwriter", index = False)

@@ -23,9 +23,11 @@ summaryList = ["Files graphed in this sheet", "    "]
 xlsxFiles = []
 
 class AnotherWindow(QWidget):
+    
 
     def __init__(self):
         super().__init__()
+
 
         self.btn = QtWidgets.QPushButton('Click to enter cell name', self)
         self.btn.move(20, 20)
@@ -55,6 +57,7 @@ class AnotherWindow(QWidget):
         self.layout.addWidget(self.btn)
 
     def  getXLSXinTable(self):
+        print(self.info)
         x= 0
         try:
             saveLocation =  QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "Excel Files (*.xlsx)") #tuple ([list of strings], string)
