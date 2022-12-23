@@ -96,6 +96,7 @@ class AnotherWindow(QWidget):
         fileBreakdown = workbook.get_worksheet_by_name("File Breakdown")
         condPlots = workbook.get_worksheet_by_name("Conditioning Plots")
         scPlots = workbook.get_worksheet_by_name("Scan Current Plots")
+        fileBreakdown.write_column('A1', summaryList)
 
 
         for file in xlsxFiles:
@@ -107,7 +108,6 @@ class AnotherWindow(QWidget):
             columnList = ["E","M"]
             scCount = 0
 
-            fileBreakdown.write_column('A1', summaryList)
 
             if "Cond" in file and "SC" not in file:
                 chart1 = workbook.add_chart({'type': 'scatter'})
@@ -215,7 +215,15 @@ class AnotherWindow(QWidget):
                     self.scCount += 17
                     self.scLetterCount += 1
 
+                    
+
                 
 
                 openFile.close()
+       
+        fileBreakdown.write_row((len(summaryList) + 3), 1, data = list(self.info))
+        fileBreakdown.write_row((len(summaryList) + 4), 1, data = list(self.info.values()))
+
+        #fileBreakdown.write_row(f'{len(summaryList) + 6}', 'B', self.info)    
+        workbook.close()   
         workbook.close()

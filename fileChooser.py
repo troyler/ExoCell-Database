@@ -115,14 +115,16 @@ def fileAnalyzer(incoming, name, test_files, keyCriteria): #feeder to be used as
                 name.excel_sheet = pd.DataFrame(cleanData[1:], columns=cleanData[0])
                 name.testing_time = pd.DataFrame([dates[1]], columns = [dates[0]])
             if name.test_name == "Cond2":
+                keyCriteria["Cell Name"] = name.cell_id
                 name.get_current_density()
-                keyCriteria["Initial Current Density"] = name.current_density
+                keyCriteria["Initial Current Density"] = str(name.current_density) + " (mA/cmÂ²)"
             if name.test_name == "SC1":   #feeder used to change option 
                 name.get_OCV()
-                keyCriteria["Startup OCV"] = name.startup_ocv
+                keyCriteria["Startup OCV"] = str(name.startup_ocv) + " (V)"
                 temp_test_number = int(name.test_number) - 1
                 get_steadyState_current(test_files, temp_test_number, keyCriteria)
                 name.get_max_power_density()
+                keyCriteria["Max Power Density"] = name.test_name + str(name.max_power_density) + " (mW/cmÂ²)"
 
 
 
@@ -135,8 +137,8 @@ def get_steadyState_current(test_files, temp_test_number, keyCriteria):
             fileHolder = test_files.get(file.file_path)
             fileHolder.get_ss_current_density()
             fileHolder.get_ss_current()
-            keyCriteria["Steady State Current"] = f"{fileHolder.ss_current} on file {fileHolder.test_name}"
-            keyCriteria["Steady State Current Density"] = f"{fileHolder.ss_current_density} on file {fileHolder.test_name}"
+            keyCriteria["Steady State Current"] = f"{fileHolder.ss_current}(A) on file {fileHolder.test_name}"
+            keyCriteria["Steady State Current Density"] = f"{fileHolder.ss_current_density}(mA/cmÂ²) on file {fileHolder.test_name}"
             break
         else:
             counter+=1
