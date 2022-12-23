@@ -42,11 +42,11 @@ class sc_tests(fileInfo):
 
     def get_OCV(self):
         self.startup_ocv = self.excel_sheet.loc[0,"E_Stack (V)"]
-        print(self.test_name , " Startup OCV " , self.startup_ocv)
+        print(self.test_name , "Startup OCV" , self.startup_ocv)
 
     def get_max_power_density(self):
         self.max_power_density = max(self.excel_sheet.loc[:,"Power (mW/cmÂ²)"])
-        print("Max power density" , self.max_power_density)
+        print("Max power density", self.test_name,  self.max_power_density)
 
 
     def __str__(self):
@@ -54,6 +54,9 @@ class sc_tests(fileInfo):
 
     def is_SC(self):
         return True
+    
+    def is_cond(self):
+        return False
        
 class cond_tests(fileInfo):
     def __init__(self,file_path, cell_id, test_name, test_type, test_number, test_date, other, location, excel_sheet):
@@ -73,16 +76,21 @@ class cond_tests(fileInfo):
         self.current_density = current_density_column
         print("Initial Current Density" , self.current_density)
 
+    def get_ss_current_density(self):
+        self.ss_current_density = self.excel_sheet.loc[len(self.excel_sheet)-1,"I (mA/cmÂ²)"]
+        print("Steady State Current Density" ,self.test_name, self.ss_current_density)
+
     def get_ss_current(self):
         self.ss_current = self.excel_sheet.loc[len(self.excel_sheet)-1,"I (A)"]
         print("Steady State Current " ,self.test_name, self.ss_current)
-
 
     def __str__(self):
         return super().__str__() + " " + self.test_type
 
     def is_cond(self):
         return True
+
+    
 
 
 
