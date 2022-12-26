@@ -51,6 +51,29 @@ class MainWindow(QMainWindow):
         self.analysisButton.clicked.connect(lambda: self.fileRunner(test_files))   
         self.fileTableBreak= QtWidgets.QTableWidget(6,6)
 
+
+        self.input_cell_size = QtWidgets.QLineEdit()
+        self.input_comp_material = QtWidgets.QLineEdit()
+        self.input_comp_pattern = QtWidgets.QLineEdit()
+        self.input_comp_force = QtWidgets.QLineEdit()
+
+        self.input_cell_size.editingFinished.connect(lambda: self.enterPress(self.input_cell_size.text(), "Cell Size"))
+        self.input_comp_material.editingFinished.connect(lambda: self.enterPress(self.input_comp_material.text(), "Compression Material"))
+        self.input_comp_pattern.editingFinished.connect(lambda: self.enterPress(self.input_comp_pattern.text(),"Compression Pattern (shape, contact %)" ))
+        self.input_comp_force.editingFinished.connect(lambda : self.enterPress(self.input_comp_force.text(), "Compression Force"))
+
+
+        self.flo = QtWidgets.QFormLayout()
+        self.flo.addRow("Cell Size\n", self.input_cell_size)
+        self.flo.addRow("Compression Material\n", self.input_comp_material)
+        self.flo.addRow("Compression Pattern (shape, contact %)\n", self.input_comp_pattern)
+        self.flo.addRow("Compression Force\n", self.input_comp_force)
+
+
+
+
+
+
         self.horizontalLayout = QHBoxLayout()
     
 
@@ -65,6 +88,7 @@ class MainWindow(QMainWindow):
         self.fileViewerLayout.addWidget(self.button)
 
         self.fileSaveLayout = QVBoxLayout()
+        self.fileSaveLayout.addLayout(self.flo)
         self.fileSaveLayout.addWidget(self.saveLocationStamp)
         self.fileSaveLayout.addWidget(self.saveLocationLabel)
         self.fileSaveLayout.addWidget(self.chooseSaveLocationButton)
@@ -77,8 +101,15 @@ class MainWindow(QMainWindow):
         widget.setLayout(self.horizontalLayout)
         self.setCentralWidget(widget)
         self.popups = []
-        
+    
+    def textchanged(self,text):
+                print("Changed: " + text)
 
+    def enterPress(self, text, criteria):
+        print("Enter pressed: " + text + criteria)
+        keyCriteria[criteria] = text
+        print(keyCriteria)
+        
     def use_regex(self,input_text):
         pattern = re.compile(r"[0-9]_[A-Za-z0-9]+_[A-Za-z0-9]+_[0-9]*\.[0-9]+[a-zA-Z]+_([A-Za-z0-9]+( [A-Za-z0-9]+)+)_([+-]?(?=\.\d|\d)(?:\d+)?(?:\.?\d*))(?:[eE]([+-]?\d+))?(\s([A-Za-z0-9]+\s)+)[A-Za-z0-9]+_([0-9]+(-[0-9]+)+)", re.IGNORECASE)
         print(pattern.match(input_text))
@@ -87,7 +118,10 @@ class MainWindow(QMainWindow):
     def show_new_window(self):
         print(keyCriteria)
         w = AnotherWindow()
-        w.info = keyCriteria
+        
+        desired_order_list = ["Cell Name", "Cell Size", "Date Tested", "Hydrogen Flow","Compression Material", "Compression Pattern (shape, contact %)", "Compression Force", "Initial Current Density", "Startup OCV", "Steady State Current", "Steady State Current Density", "Max Power Density"]
+        reordered_dict = {k: keyCriteria[k] for k in desired_order_list}
+        w.info = reordered_dict
         w.show()
     
 #function to bring in file paths as strings in a list

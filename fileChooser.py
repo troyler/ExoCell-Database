@@ -22,6 +22,7 @@ def file_chooser(folder, widget):
                     temp_cell_id = " "     #setting temp values to update and use for instantiating object for files
                     temp_test_name = " "
                     temp_test_type = " "
+                    temp_hydrogen_flow = " "
                     temp_test_number = ""
                     temp_date = ""
                     temp_other = ""
@@ -31,23 +32,26 @@ def file_chooser(folder, widget):
                         temp_cell_id = temp_file_path[1]   
                         temp_test_name = temp_file_path[2]
                         temp_test_number = temp_file_path[0]            #updating temp values 
+                        temp_hydrogen_flow = temp_file_path[4]
+                        if "ccm" not in temp_hydrogen_flow:
+                            temp_hydrogen_flow = temp_file_path[3]
                         temp_other = " ".join(temp_file_path[3:-1])
                         temp_date = temp_file_path[-1]
                         temp_location = file
-                        if len(temp_cell_id) == 8:    #checking format
+                        if len(temp_cell_id) == 8 or len(temp_cell_id) == 10:    #checking format
                             fileList.append(file)
                             if "SC" or "Cond" or "OCV" in temp_test_name and len(temp_test_name) <=6:
                                 if "SC" in temp_test_name:
                                     temp_test_type  = "SC"
-                                    test = sc_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_excel_sheet)
+                                    test = sc_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_hydrogen_flow, temp_excel_sheet)
                                     test_files[test.file_path] = test
                                 elif "Cond" in temp_test_name:
                                     temp_test_type  = "Conditioning"
-                                    test = cond_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_excel_sheet)
+                                    test = cond_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_hydrogen_flow, temp_excel_sheet)
                                     test_files[test.file_path] = test
                                 elif "OCV" in temp_test_name:
                                     temp_test_type  = "OCV"
-                                    test = OCV_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_excel_sheet)
+                                    test = OCV_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_hydrogen_flow, temp_excel_sheet)
                                     test_files[test.file_path] = test
                             else:
                                 widget.setText(f"{fileTitle} was not an OCV, SC, or Cond file")
@@ -116,15 +120,21 @@ def fileAnalyzer(incoming, name, test_files, keyCriteria): #feeder to be used as
                 name.testing_time = pd.DataFrame([dates[1]], columns = [dates[0]])
             if name.test_name == "Cond2":
                 keyCriteria["Cell Name"] = name.cell_id
+                keyCriteria["Hydrogen Flow"] = name.hydrogen_flow
+                if "ccm" in name.hydrogen_flow:
+                    keyCriteria["Hydrogen Flow"] = str(name.hydrogen_flow.split(" ")[0] + " (mL/min)")
                 name.get_current_density()
                 keyCriteria["Initial Current Density"] = str(name.current_density) + " (mA/cmÂ²)"
+                keyCriteria["Startup OCV"] = " (V)"
+                keyCriteria["Max Power Density"] = "(mW/cmÂ²)"
+                keyCriteria["Date Tested"] = name.test_date
             if name.test_name == "SC1":   #feeder used to change option 
                 name.get_OCV()
                 keyCriteria["Startup OCV"] = str(name.startup_ocv) + " (V)"
                 temp_test_number = int(name.test_number) - 1
                 get_steadyState_current(test_files, temp_test_number, keyCriteria)
                 name.get_max_power_density()
-                keyCriteria["Max Power Density"] = name.test_name + str(name.max_power_density) + " (mW/cmÂ²)"
+                keyCriteria["Max Power Density"] = name.test_name + " " + str(name.max_power_density) + " (mW/cmÂ²)"
 
 
 
