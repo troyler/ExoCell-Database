@@ -77,18 +77,21 @@ class MainWindow(QMainWindow):
 
 
         self.horizontalLayout = QVBoxLayout()
+        self.topVertLayout = QVBoxLayout()
+        self.midVertLayout = QVBoxLayout()
     
 
         self.fileOpenerLayout = QHBoxLayout()
+        self.fileOpenerLayout.addLayout(self.topVertLayout)
         self.fileOpenerLayout.addWidget(self.fileListWidget)
-        self.fileOpenerLayout.addWidget(self.openFileButton)
-        self.fileOpenerLayout.addWidget(self.clearButton)
+        self.topVertLayout.addWidget(self.openFileButton)
+        self.topVertLayout.addWidget(self.clearButton)
 
         self.fileViewerLayout = QHBoxLayout()
-        self.fileViewerLayout.addWidget(self.namingLabel)
+        self.fileViewerLayout.addLayout(self.midVertLayout)
         self.fileViewerLayout.addWidget(self.fileTableBreak)
-        self.fileViewerLayout.addWidget(self.analysisButton)
-        self.fileViewerLayout.addWidget(self.button)
+        self.midVertLayout.addWidget(self.analysisButton)
+        self.midVertLayout.addWidget(self.button)
 
         self.fileSaveLayout = QHBoxLayout()
         self.fileSaveLayout.addLayout(self.flo)
