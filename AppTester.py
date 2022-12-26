@@ -15,6 +15,7 @@ from fileChooser import file_chooser,fileAnalyzer
 class TestForErrors(unittest.TestCase):
 
     def testFolder(self):
+        print(194 + 155 + 229 + 92)
         folder = os.listdir("/Users/tyler/Desktop/ExoCell/FCD Files")
         result = file_chooser(folder)
         for each in folder:

@@ -44,6 +44,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("TFFC Data Automation")
         self.openFileButton = QtWidgets.QPushButton("Press to open files")
         self.openFileButton.clicked.connect(lambda : self.file_open())
+        self.clearButton = QtWidgets.QPushButton("Press to clear files")
+        self.clearButton.clicked.connect(lambda: self.clearFiles(test_files))
         self.fileListWidget = QtWidgets.QListWidget()
         self.fileListWidget.setAlternatingRowColors(True)
         self.namingLabel = QtWidgets.QLabel("File Breakdown")
@@ -74,20 +76,21 @@ class MainWindow(QMainWindow):
 
 
 
-        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout = QVBoxLayout()
     
 
-        self.fileOpenerLayout = QVBoxLayout()
+        self.fileOpenerLayout = QHBoxLayout()
         self.fileOpenerLayout.addWidget(self.fileListWidget)
         self.fileOpenerLayout.addWidget(self.openFileButton)
+        self.fileOpenerLayout.addWidget(self.clearButton)
 
-        self.fileViewerLayout = QVBoxLayout()
+        self.fileViewerLayout = QHBoxLayout()
         self.fileViewerLayout.addWidget(self.namingLabel)
         self.fileViewerLayout.addWidget(self.fileTableBreak)
         self.fileViewerLayout.addWidget(self.analysisButton)
         self.fileViewerLayout.addWidget(self.button)
 
-        self.fileSaveLayout = QVBoxLayout()
+        self.fileSaveLayout = QHBoxLayout()
         self.fileSaveLayout.addLayout(self.flo)
         self.fileSaveLayout.addWidget(self.saveLocationStamp)
         self.fileSaveLayout.addWidget(self.saveLocationLabel)
@@ -110,6 +113,13 @@ class MainWindow(QMainWindow):
         keyCriteria[criteria] = text
         print(keyCriteria)
         
+
+    def clearFiles(self, test_files):
+        test_files.clear()
+        fileViewerFunc(test_files, self.fileTableBreak)
+        keyCriteria.clear()
+        self.fileListWidget.clear()
+    
     def use_regex(self,input_text):
         pattern = re.compile(r"[0-9]_[A-Za-z0-9]+_[A-Za-z0-9]+_[0-9]*\.[0-9]+[a-zA-Z]+_([A-Za-z0-9]+( [A-Za-z0-9]+)+)_([+-]?(?=\.\d|\d)(?:\d+)?(?:\.?\d*))(?:[eE]([+-]?\d+))?(\s([A-Za-z0-9]+\s)+)[A-Za-z0-9]+_([0-9]+(-[0-9]+)+)", re.IGNORECASE)
         print(pattern.match(input_text))
@@ -117,12 +127,24 @@ class MainWindow(QMainWindow):
 
     def show_new_window(self):
         print(keyCriteria)
-        w = AnotherWindow()
-        
-        desired_order_list = ["Cell Name", "Cell Size", "Date Tested", "Hydrogen Flow","Compression Material", "Compression Pattern (shape, contact %)", "Compression Force", "Initial Current Density", "Startup OCV", "Steady State Current", "Steady State Current Density", "Max Power Density"]
-        reordered_dict = {k: keyCriteria[k] for k in desired_order_list}
-        w.info = reordered_dict
-        w.show()
+        counter = 0
+        tests = []
+        file_objects = list(test_files.values())
+        while counter < len(file_objects):
+            file = file_objects[counter]
+            tests.append(test_files.get(file.file_path).test_name)
+            counter +=1 
+        #file_path, cell_id, test_name, test_type, test_number, test_date, other
+        if "Cond2" not in tests:
+             self.msg.setText("No Cond 2, need cond2 for key info")
+             self.msg.exec_()  
+             return
+        else:
+            w = AnotherWindow()
+            desired_order_list = ["Cell Name", "Cell Size", "Date Tested", "Hydrogen Flow","Compression Material", "Compression Pattern (shape, contact %)", "Compression Force", "Initial Current Density", "Startup OCV", "Steady State Current", "Steady State Current Density", "Max Power Density"]
+            reordered_dict = {k: keyCriteria[k] for k in desired_order_list}
+            w.info = reordered_dict
+            w.show()
     
 #function to bring in file paths as strings in a list
 
@@ -192,3 +214,4 @@ if  __name__ == "__main__":
     window.show()
 
     sys.exit(app.exec_())
+

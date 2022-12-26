@@ -99,42 +99,43 @@ def fileViewerFunc(test_files, widget):
 
 
 def fileAnalyzer(incoming, name, test_files, keyCriteria): #feeder to be used as a select method potentially 
-        with open(incoming, "r", encoding='latin_1') as workingFile: #opening and reading the incoming file as workingFile
-            cleanData = []  #opening and reading the incoming file as workingFile
-            for line in workingFile:              #for each line in this file 
-                dataInfo = line.strip().split('\t')
-                if "Time:" in dataInfo[0] and ("Date" not in dataInfo[0]) and ("Slope" not in dataInfo[0]):
-                    dates = [] 
-                    time = dataInfo[0]
-                    dateString = time.split(":", maxsplit = 1)
-                    for x in dateString:
-                        dates.append(x.strip()) #strip this line of unneeded info and split it by tab. Returns a list of each item split
-           #  # # # print(dataInfo)
-                if len(dataInfo) > 10 and dataInfo[0]=="Time (Sec)":  #if the len of the list is greather than ten
-                    cleanData.append(dataInfo)
-                elif len(dataInfo) > 10:
-                    dataInfo = list(map(float,dataInfo))
-                    cleanData.append(dataInfo) 
-            if cleanData[0][0] == "Time (Sec)" : 
-                name.excel_sheet = pd.DataFrame(cleanData[1:], columns=cleanData[0])
-                name.testing_time = pd.DataFrame([dates[1]], columns = [dates[0]])
-            if name.test_name == "Cond2":
-                keyCriteria["Cell Name"] = name.cell_id
-                keyCriteria["Hydrogen Flow"] = name.hydrogen_flow
-                if "ccm" in name.hydrogen_flow:
-                    keyCriteria["Hydrogen Flow"] = str(name.hydrogen_flow.split(" ")[0] + " (mL/min)")
-                name.get_current_density()
-                keyCriteria["Initial Current Density"] = str(name.current_density) + " (mA/cmÂ²)"
-                keyCriteria["Startup OCV"] = " (V)"
-                keyCriteria["Max Power Density"] = "(mW/cmÂ²)"
+    with open(incoming, "r", encoding='latin_1') as workingFile: #opening and reading the incoming file as workingFile
+        cleanData = []  #opening and reading the incoming file as workingFile
+        for line in workingFile:              #for each line in this file 
+            dataInfo = line.strip().split('\t')
+            if "Time:" in dataInfo[0] and ("Date" not in dataInfo[0]) and ("Slope" not in dataInfo[0]):
+                dates = [] 
+                time = dataInfo[0]
+                dateString = time.split(":", maxsplit = 1)
+                for x in dateString:
+                    dates.append(x.strip()) #strip this line of unneeded info and split it by tab. Returns a list of each item split
+        #  # # # print(dataInfo)
+            if len(dataInfo) > 10 and dataInfo[0]=="Time (Sec)":  #if the len of the list is greather than ten
+                cleanData.append(dataInfo)
+            elif len(dataInfo) > 10:
+                dataInfo = list(map(float,dataInfo))
+                cleanData.append(dataInfo) 
+        if cleanData[0][0] == "Time (Sec)" : 
+            keyCriteria["Cell Name"] = name.cell_id
+            name.excel_sheet = pd.DataFrame(cleanData[1:], columns=cleanData[0])
+            name.testing_time = pd.DataFrame([dates[1]], columns = [dates[0]])
+            keyCriteria["Hydrogen Flow"] = name.hydrogen_flow
+            if "ccm" in name.hydrogen_flow:
+                keyCriteria["Hydrogen Flow"] = str(name.hydrogen_flow.split(" ")[0] + " (mL/min)")
                 keyCriteria["Date Tested"] = name.test_date
-            if name.test_name == "SC1":   #feeder used to change option 
-                name.get_OCV()
-                keyCriteria["Startup OCV"] = str(name.startup_ocv) + " (V)"
-                temp_test_number = int(name.test_number) - 1
-                get_steadyState_current(test_files, temp_test_number, keyCriteria)
-                name.get_max_power_density()
-                keyCriteria["Max Power Density"] = name.test_name + " " + str(name.max_power_density) + " (mW/cmÂ²)"
+        if name.test_name == "Cond2":
+            name.get_current_density()
+            keyCriteria["Initial Current Density"] = str(name.current_density) + " (mA/cmÂ²)"
+            keyCriteria["Startup OCV"] = " (V)"
+            keyCriteria["Max Power Density"] = "(mW/cmÂ²)"
+        if name.test_name == "SC1":   #feeder used to change option 
+            name.get_OCV()
+            keyCriteria["Startup OCV"] = str(name.startup_ocv) + " (V)"
+            temp_test_number = int(name.test_number) - 1
+            get_steadyState_current(test_files, temp_test_number, keyCriteria)
+            name.get_max_power_density()
+            keyCriteria["Max Power Density"] = name.test_name + " " + str(name.max_power_density) + " (mW/cmÂ²)"
+
 
 
 
