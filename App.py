@@ -119,7 +119,7 @@ class MainWindow(QMainWindow):
 
     def clearFiles(self, test_files):
         test_files.clear()
-        fileViewerFunc(test_files, self.fileTableBreak)
+        self.fileTableBreak.clear()
         keyCriteria.clear()
         self.fileListWidget.clear()
     
@@ -166,24 +166,28 @@ class MainWindow(QMainWindow):
         return result
 
     def fileRunner(self, test_files):
-        x = 0
-        file_objects = list(test_files.values())  
-        while x < len(file_objects):
-            file = file_objects[x]
-            fileAnalyzer(test_files.get(file.file_path).location, test_files.get(file.file_path), test_files, keyCriteria)
-            x += 1
-        checksum = 0
-        for file in file_objects:
-            if file.is_cond():
-                checksum += 1
+        if len(test_files) > 0:
+            x = 0
+            file_objects = list(test_files.values())  
+            while x < len(file_objects):
+                file = file_objects[x]
+                fileAnalyzer(test_files.get(file.file_path).location, test_files.get(file.file_path), test_files, keyCriteria)
+                x += 1
+            checksum = 0
+            for file in file_objects:
+                if file.is_cond():
+                    checksum += 1
 
-        if checksum == len(test_files):
-            get_steadyState_current(test_files, checksum, keyCriteria)    
+            if checksum == len(test_files):
+                get_steadyState_current(test_files, checksum, keyCriteria)    
 
-        self.writingToExcel()
-        
-        self.fileViewerLayout.addWidget(self.button)
-        #initial_current_density(test_files)
+            self.writingToExcel()
+            
+            self.fileViewerLayout.addWidget(self.button)
+            #initial_current_density(test_files)
+        else:
+            self.msg.setText("Please choose files")
+            self.msg.exec_()
 
     def saveLocation(self):
         self.locationPath = QtWidgets.QFileDialog.getExistingDirectory(self, "Open file") #tuple ([list of strings], string)
@@ -207,7 +211,8 @@ class MainWindow(QMainWindow):
                     x+=1
             self.saveLocationStamp.setText("Saving Complete")
         else:
-            print("No save Location given")
+            self.msg.setText("No save Location given")
+            self.msg.exec_()
 
     
 if  __name__ == "__main__":

@@ -29,6 +29,9 @@ class OCV_tests(fileInfo):
 
     def is_OCV(self):
         return True
+    
+    def is_cond(self):
+        return False
         
 
 class sc_tests(fileInfo):
@@ -57,6 +60,9 @@ class sc_tests(fileInfo):
         return True
     
     def is_cond(self):
+        return False
+        
+    def is_OCV(self):
         return False
        
 class cond_tests(fileInfo):
@@ -90,6 +96,9 @@ class cond_tests(fileInfo):
 
     def is_cond(self):
         return True
+
+    def is_SC(self):
+        return False
 
     
 
