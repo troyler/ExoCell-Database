@@ -19,7 +19,18 @@ currentDirectoryList =[]
 fileList = []
 namingConv = {}
 summaryList = ["Files graphed in this sheet", "    "]
-keyCriteria = {}
+keyCriteria = {"Cell Name" : " ", 
+                "Cell Size": " ", 
+                "Date Tested" : " ", 
+                "Hydrogen Flow" : " ",
+                "Compression Material": " ",
+                 "Compression Pattern (shape, contact %)" : " ", 
+                 "Compression Force" : " ",
+                 "Initial Current Density": " ", 
+                 "Startup OCV" : " ",
+                  "Steady State Current" : " ",
+                  "Steady State Current Density" : " ",
+                   "Max Power Density" : " "}
 
 
 class MainWindow(QMainWindow):
@@ -141,13 +152,11 @@ class MainWindow(QMainWindow):
         if "Cond2" not in tests:
              self.msg.setText("No Cond 2, need cond2 for key info")
              self.msg.exec_()  
-             return
-        else:
-            w = AnotherWindow()
-            desired_order_list = ["Cell Name", "Cell Size", "Date Tested", "Hydrogen Flow","Compression Material", "Compression Pattern (shape, contact %)", "Compression Force", "Initial Current Density", "Startup OCV", "Steady State Current", "Steady State Current Density", "Max Power Density"]
-            reordered_dict = {k: keyCriteria[k] for k in desired_order_list}
-            w.info = reordered_dict
-            w.show()
+        w = AnotherWindow()
+        desired_order_list = ["Cell Name", "Cell Size", "Date Tested", "Hydrogen Flow","Compression Material", "Compression Pattern (shape, contact %)", "Compression Force", "Initial Current Density", "Startup OCV", "Steady State Current", "Steady State Current Density", "Max Power Density"]
+        reordered_dict = {k: keyCriteria[k] for k in desired_order_list}
+        w.info = reordered_dict
+        w.show()
     
 #function to bring in file paths as strings in a list
 
