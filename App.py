@@ -13,11 +13,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 import pandas as pd
 
 test_files = {}
-xlsxFiles = []
-fileDictionary = {}
-currentDirectoryList =[]
 fileList = []
-namingConv = {}
 summaryList = ["Files graphed in this sheet", "    "]
 keyCriteria = {"Cell Name" : " ", 
                 "Cell Size": " ", 
@@ -129,6 +125,7 @@ class MainWindow(QMainWindow):
         
 
     def clearFiles(self, test_files):
+        fileList.clear()
         test_files.clear()
         self.fileTableBreak.clear()
         keyCriteria.clear()
@@ -162,7 +159,7 @@ class MainWindow(QMainWindow):
 
     def file_open(self):
         fname = QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "FCD Files (*.fcd)")[0] #tuple ([list of strings], string)
-        result = file_chooser(fname, self.msg)
+        result = file_chooser(fname, fileList, test_files, self.msg)
         self.fileListWidget.clear()
         x = 0  #make verbose names for variables for high readability and obvious purpose identification 
         file_objects = list(result.values())  #file_path, cell_id, test_name, test_type, test_number, test_date, other

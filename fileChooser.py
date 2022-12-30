@@ -5,10 +5,7 @@ import os
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTableWidgetItem
 
 
-fileList = []
-test_files = {}
-
-def file_chooser(folder, widget):     
+def file_chooser(folder, fileList, test_files, widget):     
     for file in folder:
         if file != '.DS_Store':
             if "/" in file: 

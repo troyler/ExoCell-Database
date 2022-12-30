@@ -20,7 +20,6 @@ from App import *
 from fileInformer import fileInfo,sc_tests,OCV_tests,cond_tests
 
 
-test_files = {}
 
 
 
