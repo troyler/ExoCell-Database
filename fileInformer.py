@@ -1,7 +1,8 @@
 
 class fileInfo:
-    def __init__(self, file_path, cell_id, test_name, test_number, test_date, other, location, hydrogen_flow):
+    def __init__(self, file_path, cell_id, test_name, test_number, test_date, other, location, hydrogen_flow, surface_area):
         self.location = location
+        self.surface_area = surface_area
         self.file_path = file_path #absolute path
         self.cell_id = cell_id # e.g. MM221005
         self.test_name = test_name #test name (e.g. Cond2)
@@ -15,10 +16,10 @@ class fileInfo:
 
 
 class OCV_tests(fileInfo):
-    def __init__(self,file_path, cell_id, test_name, test_type, test_number, test_date, other, location, hydrogen_flow, excel_sheet):
+    def __init__(self,file_path, cell_id, test_name, test_type, test_number, test_date, other, location, hydrogen_flow, surface_area, excel_sheet):
         self.test_type = test_type # Conditioning, SC, OCV
         self.excel_sheet = excel_sheet
-        fileInfo.__init__(self, file_path, cell_id, test_name, test_number, test_date, other, location, hydrogen_flow)
+        fileInfo.__init__(self, file_path, cell_id, test_name, test_number, test_date, other, location, hydrogen_flow, surface_area)
     
     def get_hydrogen_flow(self):
         anode_column = self.excel_sheet.loc[:,"Flow_Anode (cc/min)"]
@@ -35,10 +36,10 @@ class OCV_tests(fileInfo):
         
 
 class sc_tests(fileInfo):
-    def __init__(self,file_path, cell_id, test_name, test_type, test_number, test_date, other, location, hydrogen_flow, excel_sheet):
+    def __init__(self,file_path, cell_id, test_name, test_type, test_number, test_date, other, location, hydrogen_flow, surface_area, excel_sheet):
         self.test_type = test_type # Conditioning, SC, OCV
         self.excel_sheet = excel_sheet
-        fileInfo.__init__(self, file_path, cell_id, test_name, test_number, test_date, other, location, hydrogen_flow)
+        fileInfo.__init__(self, file_path, cell_id, test_name, test_number, test_date, other, location, hydrogen_flow, surface_area)
 
     def get_hydrogen_flow(self):
         anode_column = self.excel_sheet.loc[:1,"Flow_Anode (cc/min)"]
@@ -66,10 +67,10 @@ class sc_tests(fileInfo):
         return False
        
 class cond_tests(fileInfo):
-    def __init__(self,file_path, cell_id, test_name, test_type, test_number, test_date, other, location, hydrogen_flow, excel_sheet):
+    def __init__(self,file_path, cell_id, test_name, test_type, test_number, test_date, other, location, hydrogen_flow, surface_area, excel_sheet):
         self.test_type = test_type # Conditioning, SC, OCV
         self.excel_sheet = excel_sheet
-        fileInfo.__init__(self, file_path, cell_id, test_name, test_number, test_date, other, location, hydrogen_flow)
+        fileInfo.__init__(self, file_path, cell_id, test_name, test_number, test_date, other, location, hydrogen_flow, surface_area)
 
     def get_hydrogen_flow(self):
         anode_column = self.excel_sheet.loc[:,"Flow_Anode (cc/min)"]

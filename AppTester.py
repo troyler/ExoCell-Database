@@ -26,25 +26,32 @@ from fileInformer import fileInfo,sc_tests,OCV_tests,cond_tests
 
 class TestForErrors(unittest.TestCase):
 
+    test_files = {}
+    fileList = []
+    keyCriteria = {"Cell Name" : " ", 
+                    "Cell Size": " ", 
+                    "Date Tested" : " ", 
+                    "Hydrogen Flow" : " ",
+                    "Compression Material": " ",
+                    "Compression Pattern (shape, contact %)" : " ", 
+                    "Compression Force" : " ",
+                    "Initial Current Density": " ", 
+                    "Startup OCV" : " ",
+                    "Steady State Current" : " ",
+                    "Steady State Current Density" : " ",
+                    "Max Power Density" : " "}
+
+
     def testFolder(self):
-        folder = os.listdir("/Users/tyler/Desktop/ExoCell/FCD Files")
-        result = file_chooser(folder)
-        print (result)
-        for each in folder:
-            thisPass = result.get(each)
-            if "None" not in thisPass.__str__() :
-                print(thisPass.file_path)
-                self.assertEqual(thisPass.__str__()[0], thisPass.test_number[0])
-
-    def test_hello(qtbot):
-        widget = MainWindow()
-        qtbot.addWidget(widget)
-
-        # click in the Greet button and make sure it updates the appropriate label
-        qtbot.mouseClick(widget.button_greet, QtCore.Qt.LeftButton)
-
-        assert widget.greet_label.text() == "Hello!"
-
+        message = " "
+        folders = os.listdir("/Users/tyler/Desktop/ExoCell/ExoCell Test Files/Test Folder")
+        for folder in folders:
+            files = []
+            for file in folder:
+                files.append(file)
+            result = file_chooser(files, fileList, test_files, message)
+            print(result)
+            
 
         
 

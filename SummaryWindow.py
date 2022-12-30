@@ -220,9 +220,15 @@ class AnotherWindow(QWidget):
                 
 
                 openFile.close()
-       
+        infoListValues = list(self.info.values())
+        infoList = list(self.info)
+
+        for i in range(len(self.info)):
+            fileBreakdown.set_column(i+1,i+1,max(len(infoListValues[i]), len(infoList[i])))
         fileBreakdown.write_row((len(summaryList) + 3), 1, data = list(self.info))
         fileBreakdown.write_row((len(summaryList) + 4), 1, data = list(self.info.values()))
+        fileBreakdown.write_row(0, 6, data = list(self.surface_area))
+        fileBreakdown.write_row(1, 6, data = list(map(int,list(self.surface_area.values()))))
 
         #fileBreakdown.write_row(f'{len(summaryList) + 6}', 'B', self.info)    
         workbook.close()   

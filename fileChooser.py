@@ -14,6 +14,7 @@ def file_chooser(folder, fileList, test_files, widget):
                 fileTitle = file  #for each file in self.fname[0], where the list of file paths is held
             if file not in fileList:   #checking to make sure current file path is not in list to hold filepaths
                 try:
+                    temp_surface_area = " "
                     temp_location = " "
                     temp_file_path = []
                     temp_cell_id = " "     #setting temp values to update and use for instantiating object for files
@@ -40,15 +41,15 @@ def file_chooser(folder, fileList, test_files, widget):
                             if "SC" or "Cond" or "OCV" in temp_test_name and len(temp_test_name) <=6:
                                 if "SC" in temp_test_name:
                                     temp_test_type  = "SC"
-                                    test = sc_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_hydrogen_flow, temp_excel_sheet)
+                                    test = sc_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_hydrogen_flow, temp_surface_area, temp_excel_sheet)
                                     test_files[test.file_path] = test
                                 elif "Cond" in temp_test_name:
                                     temp_test_type  = "Conditioning"
-                                    test = cond_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_hydrogen_flow, temp_excel_sheet)
+                                    test = cond_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_hydrogen_flow, temp_surface_area, temp_excel_sheet)
                                     test_files[test.file_path] = test
                                 elif "OCV" in temp_test_name:
                                     temp_test_type  = "OCV"
-                                    test = OCV_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_hydrogen_flow, temp_excel_sheet)
+                                    test = OCV_tests(fileTitle, temp_cell_id, temp_test_name, temp_test_type, temp_test_number, temp_date, temp_other, temp_location, temp_hydrogen_flow, temp_surface_area, temp_excel_sheet)
                                     test_files[test.file_path] = test
                             else:
                                 widget.setText(f"{fileTitle} was not an OCV, SC, or Cond file")
@@ -95,10 +96,11 @@ def fileViewerFunc(test_files, widget):
         x+=1
 
 
-def fileAnalyzer(incoming, name, test_files, keyCriteria): #feeder to be used as a select method potentially 
+def fileAnalyzer(incoming, name, test_files, keyCriteria, surfaceArea): #feeder to be used as a select method potentially 
     with open(incoming, "r", encoding='latin_1') as workingFile: #opening and reading the incoming file as workingFile
         cleanData = []  #opening and reading the incoming file as workingFile
         for line in workingFile:              #for each line in this file 
+            area = " "
             dataInfo = line.strip().split('\t')
             if "Time:" in dataInfo[0] and ("Date" not in dataInfo[0]) and ("Slope" not in dataInfo[0]):
                 dates = [] 
@@ -106,13 +108,17 @@ def fileAnalyzer(incoming, name, test_files, keyCriteria): #feeder to be used as
                 dateString = time.split(":", maxsplit = 1)
                 for x in dateString:
                     dates.append(x.strip()) #strip this line of unneeded info and split it by tab. Returns a list of each item split
-        #  # # # print(dataInfo)
+            if "SurfaceArea:" in dataInfo[0]:
+                area = (dataInfo[0].split(":", maxsplit = 1))[1]
+                name.surface_area = area.strip()
+                print(name.surface_area)
             if len(dataInfo) > 10 and dataInfo[0]=="Time (Sec)":  #if the len of the list is greather than ten
                 cleanData.append(dataInfo)
             elif len(dataInfo) > 10:
                 dataInfo = list(map(float,dataInfo))
                 cleanData.append(dataInfo) 
         if cleanData[0][0] == "Time (Sec)" : 
+            surfaceArea["Surface Area"] = name.surface_area
             keyCriteria["Cell Name"] = name.cell_id
             name.excel_sheet = pd.DataFrame(cleanData[1:], columns=cleanData[0])
             name.testing_time = pd.DataFrame([dates[1]], columns = [dates[0]])

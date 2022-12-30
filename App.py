@@ -12,9 +12,12 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget
 import pandas as pd
 
+#Software developed and written by Tyler Reinert
+#Fuck you Ron
+
 test_files = {}
 fileList = []
-summaryList = ["Files graphed in this sheet", "    "]
+surfaceArea = {}
 keyCriteria = {"Cell Name" : " ", 
                 "Cell Size": " ", 
                 "Date Tested" : " ", 
@@ -138,6 +141,7 @@ class MainWindow(QMainWindow):
 
     def show_new_window(self):
         print(keyCriteria)
+        print(surfaceArea)
         counter = 0
         tests = []
         file_objects = list(test_files.values())
@@ -153,6 +157,7 @@ class MainWindow(QMainWindow):
         desired_order_list = ["Cell Name", "Cell Size", "Date Tested", "Hydrogen Flow","Compression Material", "Compression Pattern (shape, contact %)", "Compression Force", "Initial Current Density", "Startup OCV", "Steady State Current", "Steady State Current Density", "Max Power Density"]
         reordered_dict = {k: keyCriteria[k] for k in desired_order_list}
         w.info = reordered_dict
+        w.surface_area = surfaceArea
         w.show()
     
 #function to bring in file paths as strings in a list
@@ -177,7 +182,7 @@ class MainWindow(QMainWindow):
             file_objects = list(test_files.values())  
             while x < len(file_objects):
                 file = file_objects[x]
-                fileAnalyzer(test_files.get(file.file_path).location, test_files.get(file.file_path), test_files, keyCriteria)
+                fileAnalyzer(test_files.get(file.file_path).location, test_files.get(file.file_path), test_files, keyCriteria, surfaceArea)
                 x += 1
             checksum = 0
             for file in file_objects:
