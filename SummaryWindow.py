@@ -21,6 +21,13 @@ from xlsxUtil import get_XLSX_in_table
 
 summaryList = ["Files graphed in this sheet", "    "]
 xlsxFiles = []
+temp_key_criteria = ["Surface Area",
+                "Hydrogen Flow",
+                 "Initial Current Density", 
+                 "Startup OCV",
+                  "Steady State Current",
+                  "Steady State Current Density",
+                   "Max Power Density"]
 
 class AnotherWindow(QWidget):
     
@@ -225,11 +232,13 @@ class AnotherWindow(QWidget):
 
         for i in range(len(self.info)):
             fileBreakdown.set_column(i+1,i+1,max(len(infoListValues[i]), len(infoList[i])))
-        fileBreakdown.write_row((len(summaryList) + 3), 1, data = list(self.info))
-        fileBreakdown.write_row((len(summaryList) + 4), 1, data = list(self.info.values()))
+        fileBreakdown.write_row((len(summaryList) + 5), 1, data = list(self.info))
+        fileBreakdown.write_row((len(summaryList) + 6), 1, data = list(self.info.values()))
         fileBreakdown.write_row(0, 6, data = list(self.surface_area))
-        fileBreakdown.write_row(1, 6, data = list(map(int,list(self.surface_area.values()))))
-
-        #fileBreakdown.write_row(f'{len(summaryList) + 6}', 'B', self.info)    
+        counter = 0
+        while counter < len(temp_key_criteria):
+            fileBreakdown.write_column(2,counter+6, self.surface_area[temp_key_criteria[counter]])
+            counter+=1
+            
         workbook.close()   
         workbook.close()
