@@ -169,6 +169,9 @@ class MainWindow(QMainWindow):
         self.fileListWidget.clear()
         self.w.info = keyCriteria
         self.w.surface_area = cell_criteria
+        #code
+        #code
+        #codes
 
         
 
