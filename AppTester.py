@@ -22,8 +22,6 @@ from fileInformer import fileInfo,sc_tests,OCV_tests,cond_tests
 
 
 
-
-
 class TestForErrors(unittest.TestCase):
 
     test_files = {}

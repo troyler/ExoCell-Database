@@ -67,6 +67,10 @@ class sc_tests(fileInfo):
 
     def get_max_power_density(self):
         self.max_power_density = max(self.excel_sheet.loc[:,"Power (mW/cmÂ²)"])
+        max_index = self.excel_sheet["Power (mW/cmÂ²)"].idxmax()
+        self.voltage_at_max_power_density = self.excel_sheet.loc[max_index,"E_Stack (V)"]
+        self.time_at_max_power_density = self.excel_sheet.loc[max_index,"Time (Sec)"]
+        print(max_index)
         print("Max power density", self.test_name,  self.max_power_density, "(mW/cmÂ²)")
 
     def get_current_density(self):
@@ -131,6 +135,10 @@ class cond_tests(fileInfo):
 
     def get_max_power_density(self):
         self.max_power_density = max(self.excel_sheet.loc[:,"Power (mW/cmÂ²)"])
+        max_index = self.excel_sheet["Power (mW/cmÂ²)"].idxmax()
+        self.voltage_at_max_power_density = self.excel_sheet.loc[max_index,"E_Stack (V)"]
+        self.time_at_max_power_density = self.excel_sheet.loc[max_index,"Time (Sec)"]
+        print(max_index)
         print("Max power density", self.test_name,  self.max_power_density, "(mW/cmÂ²)")
 
     def __str__(self):

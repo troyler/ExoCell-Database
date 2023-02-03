@@ -143,6 +143,8 @@ def fileAnalyzer(incoming, name, test_files, keyCriteria, cell_criteria): #feede
             name.get_max_power_density()
             cell_criteria["Max Power Density"].append(name.max_power_density)
             name.get_OCV()
+            cell_criteria["Voltage at Max Power Density"].append(name.voltage_at_max_power_density)
+            cell_criteria["Time at Max Power Density"].append(name.time_at_max_power_density)
             cell_criteria["Startup OCV"].append(name.startup_ocv)
             cell_criteria["Hydrogen Flow"].append(name.hydrogen_flow)
             name.get_ss_current_density()

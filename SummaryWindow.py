@@ -27,7 +27,20 @@ temp_key_criteria = ["Surface Area",
                  "Startup OCV",
                   "Steady State Current",
                   "Steady State Current Density",
-                   "Max Power Density"]
+                   "Max Power Density",
+                   "Voltage at Max Power Density",
+                   "Time at Max Power Density"]
+
+
+temp_key_labels = ["Surface Area (cm²)",
+                "Hydrogen Flow (mL/min)",
+                 "Initial Current Density (mA/cmÂ²)", 
+                 "Startup OCV (V)",
+                  "Steady State Current (mA)",
+                  "Steady State Current Density (mA/cmÂ²)",
+                   "Max Power Density (mW/cmÂ²)", 
+                   "Voltage at Max Power Density (V)",
+                   "Time at Max Power Density (s)"]
 
 class AnotherWindow(QWidget):
     
@@ -234,9 +247,10 @@ class AnotherWindow(QWidget):
             fileBreakdown.set_column(i+1,i+1,max(len(infoListValues[i]), len(infoList[i])))
         fileBreakdown.write_row((len(summaryList) + 5), 1, data = list(self.info))
         fileBreakdown.write_row((len(summaryList) + 6), 1, data = list(self.info.values()))
-        fileBreakdown.write_row(0, 6, data = list(self.surface_area))
+        fileBreakdown.write_row(0, 6, data = temp_key_labels)
         counter = 0
         while counter < len(temp_key_criteria):
+            fileBreakdown.set_column(2,counter+6, max(len(self.surface_area[temp_key_criteria[counter]]),len(temp_key_criteria[counter])))
             fileBreakdown.write_column(2,counter+6, self.surface_area[temp_key_criteria[counter]])
             counter+=1
             

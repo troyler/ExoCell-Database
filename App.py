@@ -24,7 +24,9 @@ cell_criteria = {
                  "Startup OCV" : [],
                   "Steady State Current" : [],
                   "Steady State Current Density" : [],
-                   "Max Power Density" : []}
+                   "Max Power Density" : [],
+                   "Voltage at Max Power Density" : [],
+                   "Time at Max Power Density" : []}
                    
 keyCriteria = {"Cell Name" : " ", 
                 "Cell Size": " ", 
@@ -38,6 +40,7 @@ keyCriteria = {"Cell Name" : " ",
                   "Steady State Current" : " ",
                   "Steady State Current Density" : " ",
                    "Max Power Density" : " "}
+
 
 
 class MainWindow(QMainWindow):
@@ -139,7 +142,17 @@ class MainWindow(QMainWindow):
         fileList.clear()
         test_files.clear()
         self.fileTableBreak.clear()
-        keyCriteria.clear()
+        cell_criteria = {
+                "Surface Area": [], 
+                "Hydrogen Flow" : [],
+                 "Initial Current Density": [], 
+                 "Startup OCV" : [],
+                  "Steady State Current" : [],
+                  "Steady State Current Density" : [],
+                   "Max Power Density" : [],
+                   "Voltage at Max Power Density" : [],
+                   "Time at Max Power Density" : []}
+        cell_criteria.update()
         keyCriteria = {"Cell Name" : " ", 
                 "Cell Size": " ", 
                 "Date Tested" : " ", 
@@ -152,7 +165,12 @@ class MainWindow(QMainWindow):
                   "Steady State Current" : " ",
                   "Steady State Current Density" : " ",
                    "Max Power Density" : " "}
+        keyCriteria.update()
         self.fileListWidget.clear()
+        self.w.info = keyCriteria
+        self.w.surface_area = cell_criteria
+        
+
     
     def use_regex(self,input_text):
         pattern = re.compile(r"[0-9]_[A-Za-z0-9]+_[A-Za-z0-9]+_[0-9]*\.[0-9]+[a-zA-Z]+_([A-Za-z0-9]+( [A-Za-z0-9]+)+)_([+-]?(?=\.\d|\d)(?:\d+)?(?:\.?\d*))(?:[eE]([+-]?\d+))?(\s([A-Za-z0-9]+\s)+)[A-Za-z0-9]+_([0-9]+(-[0-9]+)+)", re.IGNORECASE)
@@ -173,12 +191,12 @@ class MainWindow(QMainWindow):
         if "Cond2" not in tests:
              self.msg.setText("No Cond 2, need cond2 for key info")
              self.msg.exec_()  
-        w = AnotherWindow()
+        self.w = AnotherWindow()
         desired_order_list = ["Cell Name", "Cell Size", "Date Tested", "Hydrogen Flow","Compression Material", "Compression Pattern (shape, contact %)", "Compression Force", "Initial Current Density", "Startup OCV", "Steady State Current", "Steady State Current Density", "Max Power Density"]
         reordered_dict = {k: keyCriteria[k] for k in desired_order_list}
-        w.info = reordered_dict
-        w.surface_area = cell_criteria
-        w.show()
+        self.w.info = reordered_dict
+        self.w.surface_area = cell_criteria
+        self.w.show()
     
 #function to bring in file paths as strings in a list
 
