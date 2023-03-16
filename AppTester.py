@@ -1,7 +1,6 @@
 import unittest
 import sys
 import os
-import pytestqt
 import re
 import sys
 from fileInformer import fileInfo, sc_tests, OCV_tests, cond_tests

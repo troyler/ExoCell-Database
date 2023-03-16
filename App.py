@@ -16,7 +16,6 @@ import pandas as pd
 #Fuck you Ron
 
 test_files = {}
-fileList = []
 cell_criteria = {
                 "Surface Area": [], 
                 "Hydrogen Flow" : [],
@@ -49,7 +48,7 @@ class MainWindow(QMainWindow):
         self.setGeometry(0,300,1000,700)
         self.locationPath = None
 
-        self.w = None  # No external window yet.
+        self.w = AnotherWindow()  # No external window yet.
         self.button = QtWidgets.QPushButton("Push for Window")
         self.button.clicked.connect(lambda: self.show_new_window())
 
@@ -139,7 +138,6 @@ class MainWindow(QMainWindow):
         
 
     def clearFiles(self, test_files):
-        fileList.clear()
         test_files.clear()
         self.fileTableBreak.clear()
         cell_criteria = {
@@ -195,7 +193,6 @@ class MainWindow(QMainWindow):
         if "Cond2" not in tests:
              self.msg.setText("No Cond 2, need cond2 for key info")
              self.msg.exec_()  
-        self.w = AnotherWindow()
         desired_order_list = ["Cell Name", "Cell Size", "Date Tested", "Hydrogen Flow","Compression Material", "Compression Pattern (shape, contact %)", "Compression Force", "Initial Current Density", "Startup OCV", "Steady State Current", "Steady State Current Density", "Max Power Density"]
         reordered_dict = {k: keyCriteria[k] for k in desired_order_list}
         self.w.info = reordered_dict
@@ -206,7 +203,7 @@ class MainWindow(QMainWindow):
 
     def file_open(self):
         fname = QtWidgets.QFileDialog.getOpenFileNames(self, "Open file", "", "FCD Files (*.fcd)")[0] #tuple ([list of strings], string)
-        result = file_chooser(fname, fileList, test_files, self.msg)
+        result = file_chooser(fname,test_files, self.msg)
         self.fileListWidget.clear()
         x = 0  #make verbose names for variables for high readability and obvious purpose identification 
         file_objects = list(result.values())  #file_path, cell_id, test_name, test_type, test_number, test_date, other
@@ -255,9 +252,8 @@ class MainWindow(QMainWindow):
                 file = file_objects[x]
                 currentFileName = file.file_path
                 with pd.ExcelWriter(f"{self.locationPath}/{currentFileName}.xlsx") as writer:
-                    writer.if_sheet_exists = 'replace'
-                    test_files.get(file.file_path).testing_time.to_excel(writer, sheet_name = f"{currentFileName[0:25]}", engine="xlsxwriter", index = False, startrow = 0)
-                    test_files.get(file.file_path).excel_sheet.to_excel(writer, sheet_name = f"{currentFileName[0:25]}", engine="xlsxwriter", index = False, startrow = 3)
+                    test_files.get(file.file_path).testing_time.to_excel(writer, sheet_name = f"{currentFileName[0:25]}", index = False, startrow = 0)
+                    test_files.get(file.file_path).excel_sheet.to_excel(writer, sheet_name = f"{currentFileName[0:25]}", index = False, startrow = 3)
                     self.saveLocationStamp.setText(f"Saving {currentFileName} to")
                     writer.save()
                     print("saving")
@@ -275,4 +271,3 @@ if  __name__ == "__main__":
     window.show()
 
     sys.exit(app.exec_())
-
